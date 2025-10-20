@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoScript Academy - Plateforme d'apprentissage algorithmique</title>
+    
+    <!-- Importation des polices depuis Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. Configuration Globale & Thème
+           ========================================================================== */
+        :root {
+            /* Palette de Couleurs */
+            --primary: #6366F1;
+            --secondary: #EC4899;
+            --accent: #10B981;
+            --neutral: #94A3B8;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --border-color: #334155;
+
+            /* Couleurs des Blocs */
+            --block-variable: #F59E0B;
+            --block-condition: #8B5CF6;
+            --block-loop: #06B6D4;
+            --block-function: #EF4444;
+            --block-data: #84CC16;
+            --block-operator: #F97316;
+            --block-io: #14B8A6;
+
+            /* Typographie */
+            --font-sans: 'Inter', sans-serif;
+            --font-display: 'Poppins', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* Réinitialisation de base et styles globaux */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--neutral);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ==========================================================================
+           2. Animations
+           ========================================================================== */
+        @keyframes slideInDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        @keyframes glow { 0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.3); } 50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); } 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.3); } }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+
+        /* ==========================================================================
+           3. Structure Principale & Layout
+           ========================================================================== */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ==========================================================================
+           4. Composants Spécifiques
+           ========================================================================== */
+
+        /* --- Header --- */
+        .header {
+            height: 4rem;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            flex-shrink: 0;
+            animation: slideInDown 0.5s ease-out;
+        }
+        .header .logo { display: flex; align-items: center; gap: 0.5rem; }
+        .header .logo .icon { color: var(--primary); }
+        .header .logo h1 { font-family: var(--font-display); font-size: 1.25rem; color: white; }
+        
+        .header .progress-bar-container { flex: 1; max-width: 28rem; margin: 0 2rem; }
+        .header .progress-bar-bg { width: 100%; height: 0.625rem; background-color: #334155; border-radius: 9999px; }
+        .header .progress-bar-fill { height: 100%; background-image: linear-gradient(to right, var(--primary), var(--secondary)); border-radius: 9999px; animation: pulse 2s infinite; }
+        .header .progress-text { font-size: 0.75rem; text-align: center; margin-top: 0.25rem; color: var(--neutral); }
+
+        .header .profile-section { display: flex; align-items: center; gap: 1rem; }
+        .header .profile-section .icon-button { background: none; border: none; padding: 0.5rem; border-radius: 50%; cursor: pointer; transition: background-color 0.2s; }
+        .header .profile-section .icon-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .header .profile-section .icon { color: #CBD5E1; }
+        .header .profile-section .avatar { width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 2px solid var(--primary); }
+        .header .profile-section .username { font-weight: 500; color: white; }
+
+        /* --- Block Palette (Panneau de Gauche) --- */
+        .block-palette {
+            width: 300px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border-color);
+            padding: 1rem;
+            overflow-y: auto;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        .block-category { margin-bottom: 1.5rem; }
+        .block-category-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .block-category .icon {
+             width: 20px;
+             height: 20px;
+        }
+        .draggable-block {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: white;
+            cursor: grab;
+            margin-bottom: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid;
+            user-select: none;
+        }
+        .draggable-block:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+        .draggable-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .draggable-block:active { 
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        /* --- Zone Centrale --- */
+        .center-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Main Canvas --- */
+        .main-canvas {
+            flex: 1;
+            background-color: var(--background);
+            position: relative;
+            animation: fadeIn 0.5s ease-out 0.2s;
+            animation-fill-mode: backwards;
+            overflow: auto;
+        }
+        .main-canvas .grid-background {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.15;
+        }
+        .main-canvas .canvas-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            color: #475569;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .main-canvas .canvas-content h2 { 
+            font-family: var(--font-display); 
+            font-size: 1.875rem; 
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .main-canvas .canvas-content p {
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* Blocs sur le canvas */
+        .canvas-block {
+            position: absolute;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: white;
+            cursor: move;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            min-width: 200px;
+            border-left: 4px solid;
+            user-select: none;
+        }
+        .canvas-block:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Points de connexion */
+        .connection-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .connection-point:hover {
+            transform: scale(1.3);
+            animation: glow 1s infinite;
+        }
+        .connection-point.input {
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .connection-point.output {
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Connexions visuelles */
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        /* --- Execution Console (Pied de page) --- */
+        .execution-console {
+            height: 200px;
+            background-color: var(--surface);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            animation: slideInUp 0.5s ease-out;
+        }
+        .console-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .console-header .title { 
+            font-family: var(--font-display); 
+            color: white; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .console-header .controls { display: flex; gap: 0.5rem; }
+        .console-header .control-button { 
+            background: none; 
+            border: none; 
+            padding: 0.5rem; 
+            border-radius: 0.25rem; 
+            transition: background-color 0.2s; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .console-header .play { color: #34D399; } .console-header .play:hover { background-color: rgba(16, 185, 129, 0.2); }
+        .console-header .pause { color: #FBBF24; } .console-header .pause:hover { background-color: rgba(251, 191, 36, 0.2); }
+        .console-header .stop { color: #F87171; } .console-header .stop:hover { background-color: rgba(248, 113, 113, 0.2); }
+        .console-header .clear { color: #9CA3AF; } .console-header .clear:hover { background-color: rgba(156, 163, 175, 0.2); }
+        .console-output {
+            flex: 1;
+            padding: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            overflow-y: auto;
+        }
+        .console-output p { margin-bottom: 0.25rem; }
+        .console-output .log-variable { color: var(--block-variable); }
+        .console-output .log-error { color: #F87171; }
+        .console-output .log-success { color: var(--accent); }
+
+        /* --- Side Panel (Panneau de Droite) --- */
+        .side-panel {
+            width: 350px;
+            background-color: var(--surface);
+            border-left: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            animation: slideInRight 0.5s ease-out;
+            overflow-y: auto;
+        }
+        .tabs-list {
+            display: flex;
+            background-color: #334155;
+            border-radius: 0.75rem;
+            padding: 0.25rem;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 0.625rem 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            background: none;
+            color: #E2E8F0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .tab-button.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .tab-panels {
+            flex: 1;
+            margin-top: 0.5rem;
+        }
+        .tab-panel {
+            display: none;
+            padding: 0.75rem;
+            color: var(--neutral);
+        }
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .debugger-content h3 { 
+            font-weight: bold; 
+            color: white; 
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .variables {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .var-item {
+            background-color: var(--background);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .var-name {
+            font-size: 0.85rem;
+            color: var(--neutral);
+            margin-bottom: 5px;
+            display: block;
+        }
+        .var-value {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            display: block;
+            word-break: break-all;
+        }
+        .var-value.number { color: var(--block-variable); }
+        .var-value.string { color: var(--accent); }
+        .var-value.boolean { color: var(--block-condition); }
+
+        /* Propriétés des blocs */
+        .block-properties {
+            margin-top: 1rem;
+        }
+        .property-group {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: var(--background);
+            border-radius: 0.375rem;
+        }
+        .property-label {
+            font-size: 0.875rem;
+            color: var(--neutral);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .property-input {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            color: white;
+            font-family: var(--font-mono);
+        }
+
+        /* Objectifs du niveau */
+        .level-objectives {
+            background-color: var(--background);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .objective-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+        .objective-item.completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+        }
+        .objective-item.failed {
+            background-color: rgba(248, 113, 113, 0.1);
+            color: #F87171;
+        }
+
+        /* Boutons de niveau */
+        .level-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .level-button {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .level-button:hover {
+            background-color: var(--secondary);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .block-palette, .side-panel, .progress-bar-container {
+                display: none;
+            }
+            .header .profile-section .username {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- ==================== HEADER ==================== -->
+        <header class="header">
+            <div class="logo">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
+                <h1>AlgoScript Academy</h1>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+                <p class="progress-text" id="progress-text">Niveau 1 - Introduction aux Algorithmes</p>
+            </div>
+
+            <div class="profile-section">
+                <button class="icon-button">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <button class="icon-button">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix" alt="Avatar" class="avatar">
+                <span class="username">Élève Test</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- ==================== PANNEAU DE GAUCHE (PALETTE DE BLOCS) ==================== -->
+            <aside class="block-palette">
+                <div class="block-category">
+                    <h3 class="block-category-title" style="color: var(--block-io);">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                        Entrée/Sortie
+                    </h3>
+                    <div class="draggable-block" data-type="io" data-block="lire" style="border-left-color: var(--block-io); background-color: var(--block-io);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Lire variable
+                    </div>
+                    <div class="draggable-block" data-type="io" data-block="ecrire" style="border-left-color: var(--block-io); background-color: var(--block-io);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Écrire valeur
+                    </div>
+                    <div class="draggable-block" data-type="io" data-block="afficher" style="border-left-color: var(--block-io); background-color: var(--block-io);">
+                        <div class="connection-point input"></div>
+                        Afficher message
+                    </div>
+                </div>
+
+                <div class="block-category">
+                    <h3 class="block-category-title" style="color: var(--block-variable);">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="m12 1 2.09 6.26L22 9l-7.91 2.74L12 23l-2.09-6.26L2 15l7.91-2.74L12 1Z"/></svg>
+                        Variables & Données
+                    </h3>
+                    <div class="draggable-block" data-type="variable" data-block="declarer" style="border-left-color: var(--block-variable); background-color: var(--block-variable);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Déclarer variable
+                    </div>
+                    <div class="draggable-block" data-type="variable" data-block="affecter" style="border-left-color: var(--block-variable); background-color: var(--block-variable);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Affecter valeur
+                    </div>
+                    <div class="draggable-block" data-type="data" data-block="entier" style="border-left-color: var(--block-data); background-color: var(--block-data);">
+                        Nombre entier
+                    </div>
+                    <div class="draggable-block" data-type="data" data-block="reel" style="border-left-color: var(--block-data); background-color: var(--block-data);">
+                        Nombre réel
+                    </div>
+                    <div class="draggable-block" data-type="data" data-block="chaine" style="border-left-color: var(--block-data); background-color: var(--block-data);">
+                        Chaîne de caractères
+                    </div>
+                    <div class="draggable-block" data-type="data" data-block="booleen" style="border-left-color: var(--block-data); background-color: var(--block-data);">
+                        Booléen (Vrai/Faux)
+                    </div>
+                </div>
+
+                <div class="block-category">
+                    <h3 class="block-category-title" style="color: var(--block-operator);">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        Opérateurs
+                    </h3>
+                    <div class="draggable-block" data-type="operator" data-block="addition" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A + B (Addition)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="soustraction" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A - B (Soustraction)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="multiplication" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A × B (Multiplication)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="division" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A ÷ B (Division)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="modulo" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A mod B (Modulo)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="egal" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A = B (Égalité)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="different" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A ≠ B (Différent)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="inferieur" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A < B (Inférieur)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="superieur" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A > B (Supérieur)
+                    <div class="draggable-block" data-type="operator" data-block="et" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A ET B (ET logique)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="ou" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A OU B (OU logique)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="non" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        NON A (NON logique)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="inferieur_egal" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A ≤ B (Inférieur ou égal)
+                    </div>
+                    <div class="draggable-block" data-type="operator" data-block="superieur_egal" style="border-left-color: var(--block-operator); background-color: var(--block-operator);">
+                        A ≥ B (Supérieur ou égal)
+                    </div>
+                </div>
+
+                <div class="block-category">
+                    <h3 class="block-category-title" style="color: var(--block-condition);">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 4-3 9-3 9 1.34 9 3"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7"/></svg>
+                        Structures Conditionnelles
+                    </h3>
+                    <div class="draggable-block" data-type="condition" data-block="si" style="border-left-color: var(--block-condition); background-color: var(--block-condition);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Si (condition)
+                    </div>
+                    <div class="draggable-block" data-type="condition" data-block="si_sinon" style="border-left-color: var(--block-condition); background-color: var(--block-condition);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Si ... Sinon
+                    </div>
+                    <div class="draggable-block" data-type="condition" data-block="selon" style="border-left-color: var(--block-condition); background-color: var(--block-condition);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Selon (cas)
+                    </div>
+                </div>
+
+                <div class="block-category">
+                    <h3 class="block-category-title" style="color: var(--block-loop);">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-2.2M22 12.5a10 10 0 0 1-18.8 2.2"/></svg>
+                        Structures Répétitives
+                    </h3>
+                    <div class="draggable-block" data-type="loop" data-block="pour" style="border-left-color: var(--block-loop); background-color: var(--block-loop);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Pour i de 1 à n
+                    </div>
+                    <div class="draggable-block" data-type="loop" data-block="tant_que" style="border-left-color: var(--block-loop); background-color: var(--block-loop);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Tant que (condition)
+                    </div>
+                    <div class="draggable-block" data-type="loop" data-block="repeter" style="border-left-color: var(--block-loop); background-color: var(--block-loop);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Répéter ... Jusqu'à
+                    </div>
+                </div>
+
+                <div class="block-category">
+                    <h3 class="block-category-title" style="color: var(--block-function);">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+                        Fonctions & Procédures
+                    </h3>
+                    <div class="draggable-block" data-type="function" data-block="fonction" style="border-left-color: var(--block-function); background-color: var(--block-function);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Fonction
+                    </div>
+                    <div class="draggable-block" data-type="function" data-block="procedure" style="border-left-color: var(--block-function); background-color: var(--block-function);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Procédure
+                    </div>
+                    <div class="draggable-block" data-type="function" data-block="appel" style="border-left-color: var(--block-function); background-color: var(--block-function);">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                        Appel fonction
+                    </div>
+                    <div class="draggable-block" data-type="function" data-block="retourner" style="border-left-color: var(--block-function); background-color: var(--block-function);">
+                        <div class="connection-point input"></div>
+                        Retourner valeur
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ==================== ZONE CENTRALE ==================== -->
+            <div class="center-area">
+                <div class="main-canvas" id="canvas">
+                    <div class="grid-background">
+                        <svg width="100%" height="100%">
+                            <defs>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                        </svg>
+                    </div>
+                    <div class="canvas-content" id="canvas-content">
+                        <h2>Zone de Construction d'Algorithmes</h2>
+                        <p>Glissez et déposez les blocs depuis la palette de gauche pour construire votre algorithme. 
+                        Connectez les blocs entre eux pour créer un flux logique cohérent.</p>
+                        <div style="margin-top: 2rem;">
+                            <svg width="120" height="80" style="opacity: 0.3;">
+                                <rect x="10" y="20" width="100" height="20" fill="var(--primary)" rx="4"/>
+                                <rect x="20" y="45" width="80" height="20" fill="var(--secondary)" rx="4"/>
+                                <path d="M60 40 L60 45" stroke="white" stroke-width="2"/>
+                                <circle cx="60" cy="18" r="3" fill="white"/>
+                                <circle cx="60" cy="67" r="3" fill="white"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="execution-console">
+                    <div class="console-header">
+                        <div class="title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,17 10,11 4,5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                            Console d'Exécution
+                        </div>
+                        <div class="controls">
+                            <button class="control-button play" onclick="executeAlgorithm()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                            </button>
+                            <button class="control-button pause" onclick="pauseExecution()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                            </button>
+                            <button class="control-button stop" onclick="stopExecution()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14"/></svg>
+                            </button>
+                            <button class="control-button clear" onclick="clearConsole()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="console-output" id="console-output">
+                        <p style="color: var(--neutral); font-style: italic;">Console prête. Cliquez sur ▶ pour exécuter votre algorithme.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PANNEAU DE DROITE ==================== -->
+            <aside class="side-panel">
+                <div class="tabs-list">
+                    <button class="tab-button active" onclick="switchTab('level')">Niveau</button>
+                    <button class="tab-button" onclick="switchTab('debugger')">Débogueur</button>
+                    <button class="tab-button" onclick="switchTab('properties')">Propriétés</button>
+                </div>
+
+                <div class="tab-panels">
+                    <!-- Onglet Niveau -->
+                    <div class="tab-panel active" id="level-panel">
+                        <div class="level-objectives">
+                            <h3 style="color: white; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9l-5.91 4.47L18 22l-6-3.27L6 22l1.91-8.53L2 9l6.91-1.74L12 2z"/></svg>
+                                Objectifs du Niveau
+                            </h3>
+                            <div id="objectives-list">
+                                <!-- Les objectifs seront générés dynamiquement -->
+                            </div>
+                        </div>
+
+                        <div class="level-controls">
+                            <button class="level-button" onclick="previousLevel()">← Précédent</button>
+                            <button class="level-button" onclick="nextLevel()">Suivant →</button>
+                        </div>
+
+                        <div class="level-info" style="background-color: var(--background); padding: 1rem; border-radius: 0.5rem;">
+                            <h4 style="color: white; margin-bottom: 0.5rem;">Description</h4>
+                            <p id="level-description" style="line-height: 1.5; color: var(--neutral);">
+                                <!-- Description du niveau sera générée dynamiquement -->
+                            </p>
+                        </div>
+
+                        <div class="level-hint" style="background-color: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; border-left: 4px solid var(--accent);">
+                            <h4 style="color: var(--accent); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                Conseil
+                            </h4>
+                            <p id="level-hint" style="color: var(--neutral); font-size: 0.875rem;">
+                                <!-- Conseil du niveau sera généré dynamiquement -->
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Onglet Débogueur -->
+                    <div class="tab-panel" id="debugger-panel">
+                        <div class="debugger-content">
+                            <h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/></svg>
+                                Variables Actuelles
+                            </h3>
+                            <div class="variables" id="variables-list">
+                                <div class="var-item">
+                                    <span class="var-name">Aucune variable</span>
+                                    <span class="var-value" style="color: var(--neutral); font-style: italic;">L'exécution n'a pas commencé</span>
+                                </div>
+                            </div>
+
+                            <h3 style="margin-top: 1.5rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 4-3 9-3 9 1.34 9 3"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7"/></svg>
+                                État d'Exécution
+                            </h3>
+                            <div style="background-color: var(--background); padding: 0.75rem; border-radius: 0.375rem;">
+                                <p id="execution-state" style="color: var(--neutral); font-family: var(--font-mono); font-size: 0.875rem;">
+                                    En attente d'exécution
+                                </p>
+                            </div>
+
+                            <h3 style="margin-top: 1.5rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                                Contrôles de Débogage
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                                <button class="level-button" onclick="stepByStep()" style="background-color: var(--accent);">
+                                    Exécution Pas à Pas
+                                </button>
+                                <button class="level-button" onclick="addBreakpoint()" style="background-color: var(--block-function);">
+                                    Ajouter Point d'Arrêt
+                                </button>
+                                <button class="level-button" onclick="resetDebugger()" style="background-color: var(--neutral);">
+                                    Réinitialiser
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Onglet Propriétés -->
+                    <div class="tab-panel" id="properties-panel">
+                        <div id="block-properties">
+                            <p style="color: var(--neutral); text-align: center; padding: 2rem; font-style: italic;">
+                                Sélectionnez un bloc pour voir ses propriétés
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        // ==================== VARIABLES GLOBALES ====================
+        let currentLevel = 1;
+        let canvasBlocks = [];
+        let connections = [];
+        let draggedBlock = null;
+        let selectedBlock = null;
+        let executionState = 'stopped';
+        let variables = {};
+        let executionStep = 0;
+        let isExecuting = false;
+
+        // ==================== SYSTÈME DE NIVEAUX ====================
+        const levels = {
+            1: {
+                title: "Introduction aux Algorithmes",
+                description: "Découvrez les concepts de base des algorithmes avec des opérations simples d'entrée et de sortie.",
+                objectives: [
+                    "Comprendre ce qu'est un algorithme",
+                    "Utiliser les blocs d'entrée et de sortie",
+                    "Créer votre premier programme simple"
+                ],
+                hint: "Commencez par utiliser un bloc 'Lire variable' suivi d'un bloc 'Afficher message'.",
+                allowedBlocks: ["lire", "ecrire", "afficher", "entier", "chaine"],
+                requiredBlocks: ["lire", "afficher"],
+                maxBlocks: 5
+            },
+            2: {
+                title: "Variables et Affectation",
+                description: "Apprenez à déclarer des variables et à leur affecter des valeurs.",
+                objectives: [
+                    "Déclarer une variable",
+                    "Affecter une valeur à une variable",
+                    "Utiliser différents types de données"
+                ],
+                hint: "Utilisez 'Déclarer variable' puis 'Affecter valeur' pour manipuler les données.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "reel", "chaine", "booleen"],
+                requiredBlocks: ["declarer", "affecter"],
+                maxBlocks: 8
+            },
+            3: {
+                title: "Opérations Arithmétiques",
+                description: "Maîtrisez les opérations de base : addition, soustraction, multiplication et division.",
+                objectives: [
+                    "Effectuer des calculs simples",
+                    "Utiliser les opérateurs arithmétiques",
+                    "Stocker le résultat dans une variable"
+                ],
+                hint: "Combinez les opérateurs avec des variables pour créer des expressions mathématiques.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "reel", "addition", "soustraction", "multiplication", "division"],
+                requiredBlocks: ["addition", "affecter"],
+                maxBlocks: 10
+            },
+            4: {
+                title: "Structures Conditionnelles - Si",
+                description: "Introduisez la logique conditionnelle avec les structures 'Si'.",
+                objectives: [
+                    "Utiliser une condition simple",
+                    "Comprendre les opérateurs de comparaison",
+                    "Créer un branchement dans le programme"
+                ],
+                hint: "Utilisez les opérateurs de comparaison (=, <, >) pour créer des conditions.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "reel", "si", "egal", "different", "inferieur", "superieur"],
+                requiredBlocks: ["si", "egal"],
+                maxBlocks: 12
+            },
+            5: {
+                title: "Structures Conditionnelles - Si...Sinon",
+                description: "Approfondissez les conditions avec la structure complète Si...Sinon.",
+                objectives: [
+                    "Utiliser Si...Sinon",
+                    "Gérer deux cas différents",
+                    "Optimiser la logique du programme"
+                ],
+                hint: "Le bloc 'Sinon' s'exécute quand la condition du 'Si' est fausse.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "reel", "si_sinon", "egal", "different", "inferieur", "superieur", "inferieur_egal", "superieur_egal"],
+                requiredBlocks: ["si_sinon"],
+                maxBlocks: 15
+            },
+            6: {
+                title: "Opérateurs Logiques",
+                description: "Découvrez les opérateurs logiques ET, OU et NON pour des conditions complexes.",
+                objectives: [
+                    "Combiner plusieurs conditions",
+                    "Utiliser ET, OU, NON",
+                    "Créer des expressions logiques complexes"
+                ],
+                hint: "ET nécessite que toutes les conditions soient vraies, OU nécessite qu'au moins une soit vraie.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "reel", "booleen", "si_sinon", "egal", "different", "inferieur", "superieur", "et", "ou", "non"],
+                requiredBlocks: ["et", "ou"],
+                maxBlocks: 18
+            },
+            7: {
+                title: "Boucles - Pour",
+                description: "Introduisez les boucles avec la structure 'Pour' pour répéter des actions.",
+                objectives: [
+                    "Créer une boucle simple",
+                    "Contrôler le nombre d'itérations",
+                    "Utiliser un compteur de boucle"
+                ],
+                hint: "La boucle 'Pour' répète un bloc d'instructions un nombre défini de fois.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "pour", "addition", "multiplication"],
+                requiredBlocks: ["pour"],
+                maxBlocks: 12
+            },
+            8: {
+                title: "Boucles - Tant Que",
+                description: "Maîtrisez les boucles conditionnelles avec 'Tant Que'.",
+                objectives: [
+                    "Créer une boucle conditionnelle",
+                    "Éviter les boucles infinies",
+                    "Modifier la condition dans la boucle"
+                ],
+                hint: "Assurez-vous de modifier la variable de condition à l'intérieur de la boucle.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "tant_que", "inferieur", "addition", "soustraction"],
+                requiredBlocks: ["tant_que"],
+                maxBlocks: 15
+            },
+            9: {
+                title: "Algorithmes de Calcul",
+                description: "Créez des algorithmes plus complexes combinant variables, conditions et boucles.",
+                objectives: [
+                    "Calculer une somme avec une boucle",
+                    "Trouver le maximum de plusieurs nombres",
+                    "Combiner toutes les structures apprises"
+                ],
+                hint: "Utilisez une variable pour accumuler les résultats dans la boucle.",
+                allowedBlocks: ["declarer", "affecter", "lire", "ecrire", "afficher", "entier", "reel", "pour", "tant_que", "si_sinon", "addition", "multiplication", "superieur", "inferieur"],
+                requiredBlocks: ["pour", "si_sinon", "addition"],
+                maxBlocks: 20
+            },
+            10: {
+                title: "Fonctions et Procédures",
+                description: "Découvrez la modularité avec les fonctions et procédures.",
+                objectives: [
+                    "Créer une fonction simple",
+                    "Utiliser des paramètres",
+                    "Appeler une fonction dans le programme principal"
+                ],
+                hint: "Une fonction retourne une valeur, une procédure effectue des actions sans retour.",
+                allowedBlocks: ["fonction", "procedure", "appel", "retourner", "declarer", "affecter", "entier", "reel", "addition", "multiplication"],
+                requiredBlocks: ["fonction", "appel", "retourner"],
+                maxBlocks: 25
+            }
+        };
+
+        // ==================== INITIALISATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLevel();
+            setupDragAndDrop();
+            setupCanvasInteractions();
+            updateProgress();
+        });
+
+        function initializeLevel() {
+            const level = levels[currentLevel];
+            if (!level) return;
+
+            // Mettre à jour l'interface
+            document.getElementById('progress-text').textContent = `Niveau ${currentLevel} - ${level.title}`;
+            document.getElementById('level-description').textContent = level.description;
+            document.getElementById('level-hint').textContent = level.hint;
+
+            // Générer les objectifs
+            const objectivesList = document.getElementById('objectives-list');
+            objectivesList.innerHTML = '';
+            level.objectives.forEach((objective, index) => {
+                const div = document.createElement('div');
+                div.className = 'objective-item';
+                div.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    ${objective}
+                `;
+                objectivesList.appendChild(div);
+            });
+
+            // Filtrer les blocs disponibles
+            filterAvailableBlocks();
+            
+            // Réinitialiser le canvas
+            clearCanvas();
+            updateProgress();
+        }
+
+        function filterAvailableBlocks() {
+            const level = levels[currentLevel];
+            if (!level) return;
+
+            const allBlocks = document.querySelectorAll('.draggable-block');
+            allBlocks.forEach(block => {
+                const blockType = block.getAttribute('data-block');
+                if (level.allowedBlocks.includes(blockType)) {
+                    block.style.display = 'block';
+                    block.style.opacity = '1';
+                } else {
+                    block.style.display = 'none';
+                }
+            });
+        }
+                function clearCanvas() {
+            const canvas = document.getElementById('canvas');
+            // Supprime tous les blocs et lignes de connexion du canvas
+            canvas.querySelectorAll('.canvas-block, .connection-line').forEach(el => el.remove());
+            canvasBlocks = [];
+            connections = [];
+            selectedBlock = null;
+            variables = {};
+            updateDebuggerVariables();
+            // Affiche à nouveau le message d'accueil
+            document.getElementById('canvas-content').style.display = 'flex'; 
+        }
+        
+        function updateProgress() {
+            const totalLevels = Object.keys(levels).length;
+            // Calcule le pourcentage de progression
+            const progress = ((currentLevel - 1) / (totalLevels - 1)) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        // ==================== GESTION DES ONGLETS DU PANNEAU DROIT ====================
+        function switchTab(tabId) {
+            // Met à jour les boutons
+            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+            document.querySelector(`.tab-button[onclick="switchTab('${tabId}')"]`).classList.add('active');
+
+            // Affiche le bon panneau
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(`${tabId}-panel`).classList.add('active');
+        }
+
+        function setupDragAndDrop() {
+            const draggableBlocks = document.querySelectorAll('.draggable-block');
+            const canvas = document.getElementById('canvas');
+
+            // Démarre le glissement depuis la palette
+            draggableBlocks.forEach(block => {
+                // *** LA CORRECTION EST ICI ***
+                // On rend explicitement chaque bloc de la palette déplaçable.
+                block.draggable = true; 
+                
+                block.addEventListener('dragstart', (e) => {
+                    // Ajout d'un effet visuel pour indiquer quel bloc est en cours de glissement
+                    block.style.opacity = '0.5'; 
+                    e.dataTransfer.effectAllowed = 'copy';
+                    // On stocke le type de bloc pour le recréer au moment du "drop"
+                    e.dataTransfer.setData('text/plain', block.dataset.block); 
+                });
+
+                // On remet l'opacité à la normale à la fin du glissement
+                block.addEventListener('dragend', (e) => {
+                    block.style.opacity = '1';
+                });
+            });
+
+            // Permet de déposer sur le canvas
+            canvas.addEventListener('dragover', (e) => {
+                e.preventDefault(); // Nécessaire pour autoriser le 'drop'
+                e.dataTransfer.dropEffect = 'copy';
+            });
+
+            // Gère le dépôt sur le canvas
+            canvas.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const blockType = e.dataTransfer.getData('text/plain');
+                if (blockType) {
+                    const canvasRect = canvas.getBoundingClientRect();
+                    // Calcule la position de dépôt relative au canvas, en centrant le bloc sur le curseur
+                    const x = e.clientX - canvasRect.left - 100; // 100 est la moitié de la largeur min d'un bloc
+                    const y = e.clientY - canvasRect.top - 20;  // 20 est la moitié de la hauteur approx. d'un bloc
+
+                    createBlockOnCanvas(blockType, x, y);
+                }
+            });
+        }
+        
+        let blockIdCounter = 0;
+        
+        // Crée un bloc sur le canvas
+        // VERSION AMÉLIORÉE pour permettre l'édition en ligne
+        function createBlockOnCanvas(type, x, y) {
+            // Ne pas créer de bloc pour les types "données" qui ne sont pas des instructions
+            if (['entier', 'reel', 'chaine', 'booleen'].includes(type)) return;
+
+            document.getElementById('canvas-content').style.display = 'none';
+
+            const blockData = {
+                id: `block-${blockIdCounter++}`,
+                type: type,
+                x: x,
+                y: y,
+                properties: getDefaultProperties(type),
+                element: null 
+            };
+
+            const blockElement = document.createElement('div');
+            blockElement.id = blockData.id;
+            blockElement.className = 'canvas-block';
+            blockElement.style.left = `${x}px`;
+            blockElement.style.top = `${y}px`;
+            
+            const blockInfo = getBlockInfo(type);
+            blockElement.style.backgroundColor = `var(${blockInfo.colorVar})`;
+            blockElement.style.borderLeftColor = `var(${blockInfo.colorVar})`;
+            
+            // Structure interne du bloc pour l'édition
+            let innerHTML = `
+                <div class="block-content-wrapper">
+                    <span class="block-label">${generateBlockDisplayText(blockData)}</span>
+                    <input type="text" class="block-input" style="display: none; width: 90%; margin: auto;"/>
+                </div>
+            `;
+            
+            // Ajout des points de connexion
+            if (blockInfo.hasInput) {
+                innerHTML += `<div class="connection-point input" data-block-id="${blockData.id}" data-point-type="input"></div>`;
+            }
+            if (type === 'si' || type === 'si_sinon') {
+                innerHTML += `<div class="connection-point output" title="Vrai" style="bottom: -6px; left: 25%; background-color: #34D399;" data-block-id="${blockData.id}" data-point-type="output" data-condition-path="true"></div>`;
+                innerHTML += `<div class="connection-point output" title="Faux" style="bottom: -6px; left: 75%; background-color: #F87171;" data-block-id="${blockData.id}" data-point-type="output" data-condition-path="false"></div>`;
+            } else if (blockInfo.hasOutput) {
+                 innerHTML += `<div class="connection-point output" data-block-id="${blockData.id}" data-point-type="output"></div>`;
+            }
+            
+            blockElement.innerHTML = innerHTML;
+
+            document.getElementById('canvas').appendChild(blockElement);
+            
+            blockData.element = blockElement;
+            canvasBlocks.push(blockData);
+            
+            // Événements du bloc
+            blockElement.addEventListener('click', (e) => {
+                // Empêcher la sélection si on est en mode édition
+                if (e.target.classList.contains('block-input')) return;
+                selectBlock(blockData);
+            });
+
+            // *** NOUVEAU : Double-clic pour éditer ***
+            blockElement.addEventListener('dblclick', (e) => {
+                // Ne pas déclencher si on double-clique sur un point de connexion
+                if (e.target.classList.contains('connection-point')) return;
+                enterEditMode(blockData);
+            });
+        }
+
+                /**
+         * Génère le texte à afficher dans le bloc en fonction de ses propriétés actuelles.
+         * @param {object} blockData - L'objet de données du bloc.
+         * @returns {string} Le texte formaté à afficher.
+         */
+        function generateBlockDisplayText(blockData) {
+            const props = blockData.properties;
+            switch(blockData.type) {
+                case 'declarer': return `Déclarer <strong>${props.nom || ''}</strong> : ${props.type}`;
+                case 'affecter': return `<strong>${props.variable || ''}</strong> ← ${props.valeur || '0'}`;
+                case 'lire': return `Lire(<strong>${props.variable || ''}</strong>)`;
+                case 'ecrire': return `Écrire(${props.valeur || '""'})`;
+                case 'afficher': return `Afficher(${props.message || '""'})`;
+                case 'si':
+                case 'si_sinon': return `Si (<strong>${props.condition || ''}</strong>)`;
+                case 'pour': return `Pour <strong>${props.compteur}</strong> de ${props.de} à ${props.a}`;
+                case 'tant_que': return `Tant que (<strong>${props.condition || ''}</strong>)`;
+                case 'appel': return `Appeler <strong>${props.nomFonction || ''}</strong>()`;
+                case 'retourner': return `Retourner <strong>${props.valeur || ''}</strong>`;
+                default: return getBlockInfo(blockData.type).text;
+            }
+        }
+
+        /**
+         * Fait entrer un bloc en mode édition.
+         * @param {object} blockData - L'objet de données du bloc à éditer.
+         */
+        function enterEditMode(blockData) {
+            const blockElement = blockData.element;
+            const label = blockElement.querySelector('.block-label');
+            const input = blockElement.querySelector('.block-input');
+
+            // Déterminer quelle propriété est modifiable directement
+            const primaryProp = {
+                'declarer': 'nom', 'affecter': 'valeur', 'lire': 'variable',
+                'ecrire': 'valeur', 'afficher': 'message', 'si': 'condition',
+                'si_sinon': 'condition', 'tant_que': 'condition', 'appel': 'nomFonction',
+                'retourner': 'valeur'
+            }[blockData.type];
+
+            // Si le bloc n'a pas de propriété éditable principale, on ne fait rien
+            if (!primaryProp) return;
+
+            label.style.display = 'none';
+            input.style.display = 'block';
+            input.value = blockData.properties[primaryProp];
+            input.focus();
+            input.select();
+
+            // Fonction pour quitter le mode édition
+            const exit = () => {
+                // Mettre à jour la propriété du bloc
+                blockData.properties[primaryProp] = input.value;
+                
+                // Mettre à jour l'affichage
+                label.innerHTML = generateBlockDisplayText(blockData);
+                input.style.display = 'none';
+                label.style.display = 'block';
+
+                // Si le bloc était sélectionné, mettre à jour le panneau des propriétés
+                if(selectedBlock && selectedBlock.id === blockData.id) {
+                    updatePropertiesPanel();
+                }
+
+                // Nettoyer les écouteurs d'événements
+                input.removeEventListener('blur', exit);
+                input.removeEventListener('keydown', handleKey);
+            };
+
+            // Gérer la sortie avec la touche Entrée
+            const handleKey = (e) => {
+                if (e.key === 'Enter') {
+                    exit();
+                } else if (e.key === 'Escape') {
+                    // Annuler les changements
+                    input.value = blockData.properties[primaryProp]; // Restaurer l'ancienne valeur
+                    exit();
+                }
+            };
+            
+            input.addEventListener('blur', exit);
+            input.addEventListener('keydown', handleKey);
+        }
+
+        /**
+         * Met à jour le texte affiché sur un bloc spécifique.
+         * @param {string} blockId - L'ID du bloc à mettre à jour.
+         */
+        function updateBlockDisplay(blockId) {
+            const blockData = canvasBlocks.find(b => b.id === blockId);
+            if (blockData && blockData.element) {
+                const label = blockData.element.querySelector('.block-label');
+                if (label) {
+                    label.innerHTML = generateBlockDisplayText(blockData);
+                }
+            }
+        }
+
+        // Centralise les informations sur les blocs (texte, couleur, connecteurs)
+        function getBlockInfo(type) {
+            const blocks = {
+                // Entrée/Sortie
+                'lire': { text: 'Lire(variable)', colorVar: '--block-io', hasInput: true, hasOutput: true },
+                'ecrire': { text: 'Écrire(valeur)', colorVar: '--block-io', hasInput: true, hasOutput: true },
+                'afficher': { text: 'Afficher(message)', colorVar: '--block-io', hasInput: true, hasOutput: false },
+                // Variables & Données
+                'declarer': { text: 'Déclarer var', colorVar: '--block-variable', hasInput: true, hasOutput: true },
+                'affecter': { text: 'Affecter valeur', colorVar: '--block-variable', hasInput: true, hasOutput: true },
+                'entier': { text: 'Nombre entier', colorVar: '--block-data', hasInput: false, hasOutput: false },
+                'reel': { text: 'Nombre réel', colorVar: '--block-data', hasInput: false, hasOutput: false },
+                'chaine': { text: 'Chaîne', colorVar: '--block-data', hasInput: false, hasOutput: false },
+                'booleen': { text: 'Booléen', colorVar: '--block-data', hasInput: false, hasOutput: false },
+                // Opérateurs
+                'addition': { text: 'A + B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'soustraction': { text: 'A - B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'multiplication': { text: 'A × B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'division': { text: 'A ÷ B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'modulo': { text: 'A mod B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'egal': { text: 'A = B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'different': { text: 'A ≠ B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'inferieur': { text: 'A < B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'superieur': { text: 'A > B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'inferieur_egal': { text: 'A ≤ B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'superieur_egal': { text: 'A ≥ B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'et': { text: 'A ET B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'ou': { text: 'A OU B', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                'non': { text: 'NON A', colorVar: '--block-operator', hasInput: false, hasOutput: false },
+                // Conditions
+                'si': { text: 'Si (condition)', colorVar: '--block-condition', hasInput: true, hasOutput: true },
+                'si_sinon': { text: 'Si ... Sinon', colorVar: '--block-condition', hasInput: true, hasOutput: true },
+                'selon': { text: 'Selon (cas)', colorVar: '--block-condition', hasInput: true, hasOutput: true },
+                // Boucles
+                'pour': { text: 'Pour i de...à...', colorVar: '--block-loop', hasInput: true, hasOutput: true },
+                'tant_que': { text: 'Tant que (cond.)', colorVar: '--block-loop', hasInput: true, hasOutput: true },
+                'repeter': { text: 'Répéter...Jusqu\'à', colorVar: '--block-loop', hasInput: true, hasOutput: true },
+                // Fonctions
+                'fonction': { text: 'Fonction', colorVar: '--block-function', hasInput: true, hasOutput: true },
+                'procedure': { text: 'Procédure', colorVar: '--block-function', hasInput: true, hasOutput: true },
+                'appel': { text: 'Appel fonction', colorVar: '--block-function', hasInput: true, hasOutput: true },
+                'retourner': { text: 'Retourner valeur', colorVar: '--block-function', hasInput: true, hasOutput: false },
+            };
+            // Retourne l'information du bloc ou un objet par défaut si non trouvé
+            return blocks[type] || { text: type, colorVar: '--neutral', hasInput: true, hasOutput: true };
+        }
+        
+        // Fournit des propriétés par défaut pour les nouveaux blocs
+        function getDefaultProperties(type) {
+             switch(type) {
+                case 'declarer': return { nom: 'maVariable', type: 'entier', valeur: 0 };
+                case 'affecter': return { variable: 'maVariable', valeur: '0' };
+                case 'lire': return { variable: 'maVariable' };
+                case 'ecrire': return { valeur: 'maVariable' };
+                case 'afficher': return { message: '"Bonjour le monde !"' };
+                case 'si':
+                case 'si_sinon': return { condition: 'maVariable == 10' };
+                case 'pour': return { compteur: 'i', de: 1, a: 10, pas: 1 };
+                case 'tant_que': return { condition: 'i < 10' };
+                default: return {};
+            }
+        }
+        
+        // ==================== INTERACTIONS SUR LE CANVAS ====================
+        
+        let isDraggingBlock = false;
+        let dragOffsetX, dragOffsetY;
+
+        function setupCanvasInteractions() {
+            const canvas = document.getElementById('canvas');
+
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('canvas-block') || e.target.parentElement.classList.contains('canvas-block')) {
+                    const blockElement = e.target.classList.contains('canvas-block') ? e.target : e.target.parentElement;
+                    isDraggingBlock = true;
+                    selectedBlock = canvasBlocks.find(b => b.id === blockElement.id);
+                    const rect = blockElement.getBoundingClientRect();
+                    dragOffsetX = e.clientX - rect.left;
+                    dragOffsetY = e.clientY - rect.top;
+                    selectBlock(selectedBlock);
+                } else if (e.target.classList.contains('connection-point') && e.target.dataset.pointType === 'output') {
+                     startConnection(e);
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDraggingBlock && selectedBlock) {
+                    const canvasRect = canvas.getBoundingClientRect();
+                    selectedBlock.x = e.clientX - canvasRect.left - dragOffsetX;
+                    selectedBlock.y = e.clientY - canvasRect.top - dragOffsetY;
+                    selectedBlock.element.style.left = `${selectedBlock.x}px`;
+                    selectedBlock.element.style.top = `${selectedBlock.y}px`;
+                    updateConnectionsForBlock(selectedBlock.id);
+                } else if (isDrawingConnection) {
+                    updateDrawingLine(e);
+                }
+            });
+
+            canvas.addEventListener('mouseup', (e) => {
+                isDraggingBlock = false;
+                if (isDrawingConnection) {
+                    endConnection(e);
+                }
+            });
+            
+            canvas.addEventListener('click', (e) => {
+                if (e.target.id === 'canvas' || e.target.classList.contains('grid-background')) {
+                    deselectAllBlocks();
+                }
+            });
+        }
+        
+        function selectBlock(blockData) {
+            deselectAllBlocks();
+            selectedBlock = blockData;
+            selectedBlock.element.style.boxShadow = '0 0 20px var(--primary)';
+            selectedBlock.element.style.transform = 'scale(1.02)';
+            updatePropertiesPanel();
+            switchTab('properties');
+        }
+        
+        function deselectAllBlocks() {
+            if (selectedBlock) {
+                 selectedBlock.element.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                 selectedBlock.element.style.transform = 'scale(1)';
+            }
+            selectedBlock = null;
+            document.getElementById('block-properties').innerHTML = `
+                <p style="color: var(--neutral); text-align: center; padding: 2rem; font-style: italic;">
+                    Sélectionnez un bloc pour voir ses propriétés.
+                </p>`;
+        }
+
+        // ==================== PANNEAU DE PROPRIÉTÉS ====================
+
+                // VERSION AMÉLIORÉE pour synchroniser avec l'affichage du bloc
+        function updatePropertiesPanel() {
+            const propertiesPanel = document.getElementById('block-properties');
+            if (!selectedBlock) {
+                deselectAllBlocks();
+                return;
+            }
+            
+            propertiesPanel.innerHTML = '';
+            const props = selectedBlock.properties;
+            
+            let html = `<h3 style="color: white; margin-bottom: 1rem;">Propriétés de : ${getBlockInfo(selectedBlock.type).text}</h3>`;
+            
+            if(Object.keys(props).length === 0) {
+                html += `<p style="color: var(--neutral); font-style: italic;">Ce bloc n'a pas de propriétés modifiables.</p>`;
+            } else {
+                 for (const key in props) {
+                    // On ne montre pas tous les champs pour les boucles 'pour', c'est plus clair
+                    if(selectedBlock.type === 'pour' && key === 'compteur') continue;
+
+                    html += `
+                        <div class="property-group">
+                            <label class="property-label" for="prop-${key}">${key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                            <input class="property-input" type="text" id="prop-${key}" value="${props[key]}" data-key="${key}">
+                        </div>`;
+                }
+            }
+            
+            propertiesPanel.innerHTML = html;
+            
+            propertiesPanel.querySelectorAll('.property-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const key = e.target.dataset.key;
+                    // Mettre à jour la propriété de l'objet
+                    selectedBlock.properties[key] = e.target.value;
+                    // *** NOUVEAU : Mettre à jour l'affichage du bloc en temps réel ***
+                    updateBlockDisplay(selectedBlock.id);
+                });
+            });
+        }
+        
+        // ==================== LOGIQUE DES CONNEXIONS VISUELLES ====================
+        
+        let isDrawingConnection = false;
+        let connectionStartInfo = null;
+        let temporaryLine = null;
+
+        function startConnection(e) {
+            e.stopPropagation();
+            isDrawingConnection = true;
+            const blockId = e.target.dataset.blockId;
+            connectionStartInfo = {
+                blockId: blockId,
+                element: e.target,
+                path: e.target.dataset.conditionPath // Pour les blocs 'Si'
+            };
+            
+            temporaryLine = document.createElement('div');
+            temporaryLine.className = 'connection-line';
+            document.getElementById('canvas').appendChild(temporaryLine);
+            updateDrawingLine(e);
+        }
+        
+        function updateDrawingLine(e) {
+            if (!isDrawingConnection || !temporaryLine) return;
+            const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+            const startRect = connectionStartInfo.element.getBoundingClientRect();
+            const startX = startRect.left + startRect.width / 2 - canvasRect.left;
+            const startY = startRect.top + startRect.height / 2 - canvasRect.top;
+            const endX = e.clientX - canvasRect.left;
+            const endY = e.clientY - canvasRect.top;
+            drawSimpleLine(startX, startY, endX, endY, temporaryLine);
+        }
+
+        function endConnection(e) {
+            if (!isDrawingConnection) return;
+            const target = e.target;
+            
+            if (target.classList.contains('connection-point') && target.dataset.pointType === 'input') {
+                const endBlockId = target.dataset.blockId;
+                if (endBlockId !== connectionStartInfo.blockId) {
+                    const newConnection = {
+                        from: connectionStartInfo.blockId,
+                        to: endBlockId,
+                        line: temporaryLine,
+                        path: connectionStartInfo.path
+                    };
+                    connections.push(newConnection);
+                    updateConnectionsForBlock(connectionStartInfo.blockId);
+                    updateConnectionsForBlock(endBlockId);
+                    temporaryLine = null; // La ligne est maintenant une connexion permanente
+                }
+            }
+            
+            if (temporaryLine) temporaryLine.remove(); // Si la connexion est invalide
+            
+            isDrawingConnection = false;
+            connectionStartInfo = null;
+        }
+        
+        function updateConnectionsForBlock(blockId) {
+            connections.forEach(conn => {
+                if (conn.from === blockId || conn.to === blockId) {
+                    const fromBlock = canvasBlocks.find(b => b.id === conn.from);
+                    const toBlock = canvasBlocks.find(b => b.id === conn.to);
+                    if (!fromBlock || !toBlock) return;
+
+                    let startPoint = conn.path 
+                        ? fromBlock.element.querySelector(`.connection-point.output[data-condition-path="${conn.path}"]`)
+                        : fromBlock.element.querySelector('.connection-point.output');
+                    let endPoint = toBlock.element.querySelector('.connection-point.input');
+                    
+                    if (!startPoint || !endPoint) return;
+                    
+                    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+                    const startRect = startPoint.getBoundingClientRect();
+                    const endRect = endPoint.getBoundingClientRect();
+                    
+                    const startX = startRect.left + startRect.width / 2 - canvasRect.left;
+                    const startY = startRect.top + startRect.height / 2 - canvasRect.top;
+                    const endX = endRect.left + endRect.width / 2 - canvasRect.left;
+                    const endY = endRect.top + endRect.height / 2 - canvasRect.top;
+                    
+                    drawSimpleLine(startX, startY, endX, endY, conn.line);
+                }
+            });
+        }
+        
+        function drawSimpleLine(x1, y1, x2, y2, lineElement) {
+             const distance = Math.hypot(x2 - x1, y2 - y1);
+             const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+             lineElement.style.width = `${distance}px`;
+             lineElement.style.top = `${y1}px`;
+             lineElement.style.left = `${x1}px`;
+             lineElement.style.transformOrigin = '0 0';
+             lineElement.style.transform = `rotate(${angle}deg)`;
+        }
+
+        // ==================== GESTION DES NIVEAUX ====================
+        function nextLevel() {
+            if (currentLevel < Object.keys(levels).length) {
+                currentLevel++;
+                initializeLevel();
+            } else {
+                alert("Félicitations ! Vous avez terminé tous les niveaux !");
+            }
+        }
+        
+        function previousLevel() {
+            if (currentLevel > 1) {
+                currentLevel--;
+                initializeLevel();
+            }
+        }
+        
+        function checkObjectives() {
+            const level = levels[currentLevel];
+            const objectivesList = document.getElementById('objectives-list');
+            let allCompleted = true;
+            
+            level.objectives.forEach((objText, index) => {
+                 const objectiveItem = objectivesList.children[index];
+                 // Simplification: on se base sur les blocs requis
+                 const reqBlock = level.requiredBlocks[index];
+                 const blockPresent = canvasBlocks.some(b => b.type === reqBlock);
+
+                 if (blockPresent) {
+                    objectiveItem.classList.add('completed');
+                    objectiveItem.classList.remove('failed');
+                 } else {
+                    objectiveItem.classList.add('failed');
+                    objectiveItem.classList.remove('completed');
+                    allCompleted = false;
+                 }
+            });
+            
+            if (allCompleted) {
+                 logToConsole('✅ Objectifs atteints ! Vous pouvez passer au niveau suivant.', 'success');
+                 document.querySelector('.level-button[onclick="nextLevel()"]').disabled = false;
+            } else {
+                 logToConsole('❌ Certains objectifs ne sont pas remplis. Vérifiez la liste à droite.', 'error');
+                 document.querySelector('.level-button[onclick="nextLevel()"]').disabled = true;
+            }
+        }
+        
+        // ==================== MOTEUR D'EXÉCUTION ====================
+
+        function logToConsole(message, type = 'log') {
+            const consoleOutput = document.getElementById('console-output');
+            const p = document.createElement('p');
+            p.innerHTML = message; // innerHTML pour autoriser les balises
+            if (type === 'error') p.className = 'log-error';
+            if (type === 'success') p.className = 'log-success';
+            if (type === 'variable') p.className = 'log-variable';
+            consoleOutput.appendChild(p);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = `<p style="color: var(--neutral); font-style: italic;">Console prête.</p>`;
+        }
+
+        async function executeAlgorithm() {
+            if (isExecuting) return;
+            isExecuting = true;
+            clearConsole();
+            variables = {};
+            updateDebuggerVariables();
+            logToConsole('🚀 Démarrage de l\'exécution...');
+
+            const allToIds = new Set(connections.map(c => c.to));
+            let startBlock = canvasBlocks.find(b => !allToIds.has(b.id));
+
+            if (!startBlock) {
+                logToConsole('Erreur : Impossible de trouver un bloc de départ (sans connexion entrante).', 'error');
+                isExecuting = false;
+                return;
+            }
+
+            let currentBlock = startBlock;
+            while (currentBlock && isExecuting) {
+                let nextInfo = { id: null, path: undefined };
+                try {
+                    currentBlock.element.style.animation = 'glow 1.5s infinite';
+                    
+                    nextInfo = await executeBlock(currentBlock);
+                    
+                    currentBlock.element.style.animation = '';
+                    
+                    if (nextInfo.id) {
+                         const nextConnection = connections.find(c => c.from === currentBlock.id && c.to === nextInfo.id && c.path == nextInfo.path);
+                         if(nextConnection && nextConnection.line) {
+                            nextConnection.line.style.background = 'var(--accent)';
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                            nextConnection.line.style.background = '';
+                         }
+                         currentBlock = canvasBlocks.find(b => b.id === nextInfo.id);
+                    } else {
+                        currentBlock = null;
+                    }
+                    
+                } catch (error) {
+                    logToConsole(`🛑 Erreur d'exécution: ${error.message}`, 'error');
+                    if (currentBlock.element) currentBlock.element.style.animation = '';
+                    currentBlock = null;
+                }
+            }
+
+            logToConsole('🏁 Fin de l\'exécution.', 'success');
+            isExecuting = false;
+            checkObjectives();
+        }
+
+        // Évaluateur d'expression (SIMPLIFIÉ ET NON SÉCURISÉ)
+        function evaluateExpression(expression, scope) {
+            try {
+                const argNames = Object.keys(scope);
+                const argValues = Object.values(scope).map(v => v.value);
+                // Crée une fonction qui prend les variables comme arguments
+                return new Function(...argNames, `return ${expression}`)(...argValues);
+            } catch (e) {
+                throw new Error(`Expression invalide: "${expression}". ${e.message}`);
+            }
+        }
+        
+        async function executeBlock(block) {
+            const props = block.properties;
+            let nextBlockId = connections.find(c => c.from === block.id)?.to;
+            let nextPath = undefined;
+
+            switch (block.type) {
+                case 'declarer':
+                    variables[props.nom] = { type: props.type, value: props.valeur };
+                    logToConsole(`Variable '${props.nom}' déclarée avec la valeur ${props.valeur}.`, 'variable');
+                    break;
+                case 'affecter':
+                    if (!variables[props.variable]) throw new Error(`Variable '${props.variable}' non déclarée.`);
+                    const evaluatedValue = evaluateExpression(props.valeur, variables);
+                    variables[props.variable].value = evaluatedValue;
+                    logToConsole(`Variable '${props.variable}' ← ${evaluatedValue}.`, 'variable');
+                    break;
+                case 'lire':
+                    const input = prompt(`Entrez une valeur pour '${props.variable}':`);
+                    if (!variables[props.variable]) throw new Error(`Variable '${props.variable}' non déclarée.`);
+                    const parsedInput = props.type === 'entier' ? parseInt(input) : (props.type === 'reel' ? parseFloat(input) : input);
+                    variables[props.variable].value = parsedInput;
+                    logToConsole(`Lu la valeur ${parsedInput} pour '${props.variable}'.`, 'variable');
+                    break;
+                case 'ecrire':
+                case 'afficher':
+                    const valueToLog = evaluateExpression(props.valeur || props.message, variables);
+                    logToConsole(`> ${valueToLog}`);
+                    break;
+                case 'si':
+                case 'si_sinon':
+                    const result = !!evaluateExpression(props.condition, variables);
+                    logToConsole(`Condition "${props.condition}" est ${result ? 'VRAIE' : 'FAUSSE'}.`);
+                    const path = result.toString(); // 'true' ou 'false'
+                    const nextConn = connections.find(c => c.from === block.id && c.path === path);
+                    if (nextConn) {
+                        nextBlockId = nextConn.to;
+                        nextPath = path;
+                    } else if (block.type === 'si') {
+                        // S'il n'y a pas de branche VRAI/FAUX, on cherche la suite
+                        nextBlockId = null; 
+                    }
+                    break;
+            }
+
+            updateDebuggerVariables();
+            await new Promise(resolve => setTimeout(resolve, 400)); // Pause pour la visualisation
+            return { id: nextBlockId, path: nextPath };
+        }
+
+        function stopExecution() {
+             isExecuting = false;
+             document.querySelectorAll('.canvas-block').forEach(el => el.style.animation = '');
+             logToConsole('Exécution interrompue par l\'utilisateur.', 'error');
+        }
+        
+        // ==================== DÉBOGUEUR ====================
+        function updateDebuggerVariables() {
+            const varList = document.getElementById('variables-list');
+            varList.innerHTML = '';
+            if (Object.keys(variables).length === 0) {
+                 varList.innerHTML = `<div class="var-item"><span class="var-name">Aucune variable</span></div>`;
+                return;
+            }
+
+            for (const name in variables) {
+                const v = variables[name];
+                let valueClass = 'string';
+                if (typeof v.value === 'number') valueClass = 'number';
+                if (typeof v.value === 'boolean') valueClass = 'boolean';
+
+                const item = document.createElement('div');
+                item.className = 'var-item';
+                item.innerHTML = `
+                    <span class="var-name">${name} <span style="color: #94a3b8;font-size: 0.75rem;">(${v.type})</span></span>
+                    <span class="var-value ${valueClass}">${JSON.stringify(v.value)}</span>`;
+                varList.appendChild(item);
+            }
+        }
+    </script>

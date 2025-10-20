@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math'ecraft : L'Aventure des Fonctions</title>
+    
+    <!-- Polices Google pour le style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+    <!-- Librairie pour le tracé de fonctions -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/function-plot/dist/function-plot.js"></script>
+
+    <style>
+        /* --- CONFIGURATION GÉNÉRALE --- */
+        :root {
+            --bg-color: #1a1a2e;
+            --primary-color: #16213e;
+            --secondary-color: #0f3460;
+            --accent-color: #e94560;
+            --neon-blue: #40c4ff;
+            --neon-green: #00e676;
+            --text-color: #e0e0e0;
+            --disabled-color: #555;
+            --font-title: 'Orbitron', sans-serif;
+            --font-body: 'Roboto Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            font-size: 16px;
+        }
+
+        /* --- ÉCRAN DE DÉMARRAGE & SÉLECTION DE NIVEAU --- */
+        #start-screen, #level-select-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--bg-color), var(--primary-color));
+            position: absolute;
+            width: 100%;
+            z-index: 100;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        #start-screen h1 {
+            font-family: var(--font-title);
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px var(--accent-color);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        #start-screen p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            font-family: var(--font-title);
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px var(--accent-color);
+        }
+
+        #level-select-screen h2 {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--neon-blue);
+        }
+
+        #level-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            max-width: 800px;
+        }
+
+        .level-card {
+            background-color: var(--secondary-color);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .level-card.locked {
+            background-color: var(--primary-color);
+            border-color: var(--disabled-color);
+            cursor: not-allowed;
+            color: var(--disabled-color);
+        }
+
+        .level-card:not(.locked):hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-color: var(--accent-color);
+        }
+
+        .level-card.completed {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .level-card .level-number {
+            font-family: var(--font-title);
+            font-size: 2rem;
+            color: var(--neon-blue);
+        }
+
+        .level-card.completed .level-number { color: var(--neon-green); }
+        .level-card.locked .level-number { color: var(--disabled-color); }
+        .level-card .level-title { font-size: 0.8rem; }
+        .level-card.locked .level-title { color: var(--disabled-color); }
+
+
+        /* --- INTERFACE PRINCIPALE DU JEU --- */
+        #game-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            width: 100vw;
+            gap: 10px;
+            padding: 10px;
+            grid-template-areas:
+                "header header"
+                "plot-area side-panel";
+        }
+
+        #game-header {
+            grid-area: header;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+        #game-header h2 { font-family: var(--font-title); color: var(--neon-blue);}
+        #back-to-levels { background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all 0.3s; }
+        #back-to-levels:hover { background: var(--accent-color); color: white; }
+
+        #plot-container {
+            grid-area: plot-area;
+            background: var(--primary-color);
+            border-radius: 5px;
+            padding: 10px;
+            position: relative;
+        }
+        #plot-target { width: 100%; height: 100%; }
+
+        #side-panel {
+            grid-area: side-panel;
+            background: var(--primary-color);
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        #mission-brief, #course-module, #control-panel, #feedback-box {
+            background: var(--secondary-color);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid var(--neon-blue);
+        }
+
+        #mission-brief h3, #course-module h3, #control-panel h3 {
+            font-family: var(--font-title);
+            margin-bottom: 10px;
+            color: var(--neon-blue);
+        }
+        
+        #mission-objective { font-style: italic; font-size: 0.9em; }
+        #course-content { font-size: 0.9em; line-height: 1.6; }
+        #course-content code { background-color: var(--primary-color); padding: 2px 5px; border-radius: 3px; color: var(--neon-green); }
+
+        #control-panel label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #function-input {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--neon-blue);
+            color: var(--text-color);
+            padding: 10px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+
+        #submit-button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--neon-green);
+            color: var(--bg-color);
+            border: none;
+            font-family: var(--font-title);
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        #submit-button:hover {
+            filter: brightness(1.2);
+        }
+
+        #feedback-box {
+            border-left-color: var(--accent-color);
+            font-weight: bold;
+            text-align: center;
+            display: none; /* Caché par défaut */
+        }
+        #feedback-box.success { border-left-color: var(--neon-green); color: var(--neon-green); }
+        #feedback-box.error { border-left-color: var(--accent-color); color: var(--accent-color); }
+
+        /* --- MODAL DE VICTOIRE --- */
+        #victory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        #victory-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        #victory-box {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 30px var(--neon-green);
+            transform: scale(0.5);
+            transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        #victory-modal.show #victory-box {
+            transform: scale(1);
+        }
+
+        #victory-box h2 {
+            font-family: var(--font-title);
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        #victory-box p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        #next-level-button {
+            font-family: var(--font-title);
+            background-color: var(--neon-green);
+            color: var(--bg-color);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        #next-level-button:hover {
+            filter: brightness(1.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--accent-color); }
+            50% { text-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue), 0 0 50px var(--accent-color); }
+            100% { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--accent-color); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ÉCRAN DE DÉMARRAGE -->
+    <div id="start-screen">
+        <h1>Math'ecraft</h1>
+        <p>L'Aventure des Fonctions</p>
+        <p>Devenez un Architecte Mathématique. Sculptez le monde avec des fonctions, des dérivées et des limites. Votre voyage commence maintenant.</p>
+        <button id="start-button" class="cta-button">COMMENCER L'AVENTURE</button>
+    </div>
+
+    <!-- SÉLECTION DES NIVEAUX -->
+    <div id="level-select-screen" class="hidden">
+        <h2>CARTE DE CONSTRUCTION</h2>
+        <div id="level-grid">
+            <!-- Les niveaux seront générés par JS -->
+        </div>
+    </div>
+
+    <!-- INTERFACE PRINCIPALE DU JEU -->
+    <div id="game-container" class="hidden">
+        <header id="game-header">
+            <h2 id="level-current-title">NIVEAU 1: LES FONDATIONS</h2>
+            <button id="back-to-levels">◄ Retour à la carte</button>
+        </header>
+
+        <div id="plot-container">
+            <div id="plot-target"></div>
+        </div>
+
+        <aside id="side-panel">
+            <div id="mission-brief">
+                <h3>MISSION</h3>
+                <p id="mission-objective">Objectif de la mission...</p>
+            </div>
+
+            <div id="course-module">
+                <h3>PLAN DE CONSTRUCTION (COURS)</h3>
+                <div id="course-content">Contenu du cours...</div>
+            </div>
+
+            <div id="control-panel">
+                <h3>CONSOLE DE L'ARCHITECTE</h3>
+                <label for="function-input" id="input-label">f(x) =</label>
+                <input type="text" id="function-input" placeholder="Ex: x^2 + 3*x - 4">
+                <button id="submit-button">CONSTRUIRE !</button>
+            </div>
+
+            <div id="feedback-box">
+                Message de feedback
+            </div>
+        </aside>
+    </div>
+    
+    <!-- MODAL DE VICTOIRE -->
+    <div id="victory-modal">
+        <div id="victory-box">
+            <h2 id="victory-title">NIVEAU TERMINÉ !</h2>
+            <p id="victory-message">Message de félicitations.</p>
+            <button id="next-level-button">NIVEAU SUIVANT</button>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- ÉLÉMENTS DU DOM ---
+        const startScreen = document.getElementById('start-screen');
+        const levelSelectScreen = document.getElementById('level-select-screen');
+        const gameContainer = document.getElementById('game-container');
+        const startButton = document.getElementById('start-button');
+        const levelGrid = document.getElementById('level-grid');
+        const backToLevelsButton = document.getElementById('back-to-levels');
+        
+        const levelTitle = document.getElementById('level-current-title');
+        const missionObjective = document.getElementById('mission-objective');
+        const courseContent = document.getElementById('course-content');
+        const inputLabel = document.getElementById('input-label');
+        const functionInput = document.getElementById('function-input');
+        const submitButton = document.getElementById('submit-button');
+        const feedbackBox = document.getElementById('feedback-box');
+        
+        const victoryModal = document.getElementById('victory-modal');
+        const victoryTitle = document.getElementById('victory-title');
+        const victoryMessage = document.getElementById('victory-message');
+        const nextLevelButton = document.getElementById('next-level-button');
+
+        // --- ÉTAT DU JEU ---
+        let gameState = {
+            unlockedLevels: 1,
+            completedLevels: [],
+            currentLevel: 1
+        };
+
+        // --- BASE DE DONNÉES DES NIVEAUX ---
+        const levels = [
+            { // NIVEAU 1
+                title: "Les Fondations",
+                mission: "Construisez un pont rectiligne parfait entre les points A(-5, -3) et B(5, 7).",
+                course: "Une fonction affine est de la forme <code>f(x) = a*x + b</code>. 'a' est le <strong>coefficient directeur</strong> (la pente) et 'b' est l'<strong>ordonnée à l'origine</strong> (là où la droite coupe l'axe y). Pour trouver 'a', utilisez la formule : (yB - yA) / (xB - xA).",
+                inputLabel: "f(x) =",
+                placeholder: "a*x + b",
+                validation: (input) => {
+                    // Cible : f(x) = x + 2
+                    return input.replace(/\s/g, '') === 'x+2' || input.replace(/\s/g, '') === '1*x+2';
+                },
+                plotData: (userInput) => {
+                    let data = [
+                        { points: [[-5, -3], [5, 7]], fnType: 'points', graphType: 'scatter', color: 'var(--neon-green)', attr: { r: 5 } },
+                        { fn: 'x+2', color: 'var(--neon-blue)', graphType: 'polyline', 'fnType': 'implicit' } // La solution en filigrane
+                    ];
+                    if (userInput) {
+                        try { data.push({ fn: userInput, color: 'var(--accent-color)' }); } catch (e) {}
+                    }
+                    return data;
+                }
+            },
+            { // NIVEAU 2
+                title: "L'Arche Parabolique",
+                mission: "Créez une arche (parabole) qui passe par 3 piliers : A(-4,0), B(4,0) et qui atteint une hauteur maximale de 8 au centre.",
+                course: "Une parabole tournée vers le bas a une équation <code>f(x) = a(x-x1)(x-x2)</code> où x1 et x2 sont les racines (où elle coupe l'axe x). Le sommet se trouve à mi-chemin entre les racines. Sa hauteur vous donnera 'a'.",
+                inputLabel: "f(x) =",
+                placeholder: "a*(x-x1)*(x-x2)",
+                validation: (input) => {
+                    // Cible f(x) = -0.5*(x-4)*(x+4) = -0.5x^2+8
+                    const simplified = input.replace(/\s/g, '').toLowerCase();
+                    return simplified.includes('-0.5*(x-4)*(x+4)') || simplified.includes('-0.5*(x+4)*(x-4)') || simplified.includes('-0.5*x^2+8');
+                },
+                plotData: (userInput) => {
+                    let data = [
+                        { points: [[-4, 0], [4, 0], [0, 8]], fnType: 'points', graphType: 'scatter', color: 'var(--neon-green)', attr: { r: 5 } },
+                        { fn: '-0.5*x^2+8', color: 'var(--neon-blue)', graphType: 'polyline', 'fnType': 'implicit' }
+                    ];
+                    if (userInput) {
+                         try { data.push({ fn: userInput, color: 'var(--accent-color)' }); } catch (e) {}
+                    }
+                    return data;
+                }
+            },
+             { // NIVEAU 3
+                title: "La Route et le Canyon",
+                mission: "Une route est modélisée par f(x) = (2x-3)/(x-1). Tracez-la et identifiez la position du 'poteau' qui soutient le pont (l'asymptote verticale).",
+                course: "Une fonction rationnelle <code>P(x)/Q(x)</code> a une <strong>asymptote verticale</strong> lorsque son dénominateur <code>Q(x)</code> est égal à 0. C'est une valeur interdite pour la fonction, où elle tend vers l'infini.",
+                inputLabel: "x =",
+                placeholder: "Position de l'asymptote",
+                validation: (input) => input.trim() === "1",
+                plotData: () => [{ fn: '(2*x-3)/(x-1)', color: 'var(--accent-color)' }, { fn: '2', color: 'var(--neon-blue)', dashed: true }]
+            },
+            { // NIVEAU 4
+                title: "La Pente Maximale",
+                mission: "Une rampe de lancement est modélisée par f(x) = -x^3 + 3x. Trouvez la fonction qui décrit sa pente en tout point (la dérivée).",
+                course: "La <strong>dérivée</strong> f'(x) d'une fonction f(x) donne la pente de la tangente en chaque point. Pour un polynôme, la dérivée de <code>x^n</code> est <code>n*x^(n-1)</code>. La dérivée d'une somme est la somme des dérivées.",
+                inputLabel: "f'(x) =",
+                placeholder: "Dérivée de f(x)",
+                validation: (input) => input.replace(/\s/g, '') === '-3*x^2+3',
+                plotData: (userInput) => {
+                    let data = [{ fn: '-x^3 + 3*x', color: 'var(--accent-color)', label: 'Rampe' }];
+                    if (userInput) {
+                        try { 
+                            data.push({ fn: userInput, color: 'var(--neon-blue)', label: 'Pente' }); 
+                        } catch (e) {}
+                    }
+                    return data;
+                }
+            },
+            // ... Ajouter 6 autres niveaux ici sur le même modèle
+            // Niveau 5: Limites à l'infini (Asymptote Horizontale)
+            // Niveau 6: Tableau de variation (utilisant la dérivée)
+            // Niveau 7: Extrema locaux (f'(x) = 0)
+            // Niveau 8: Réciproque (1/f(x))
+            // Niveau 9: Concavité (dérivée seconde)
+            // Niveau 10: Étude de fonction complète (Le Grand Œuvre)
+             { title: "Le Grand Œuvre", mission: "Projet final : Analysez et tracez f(x) = (x^2+x-2)/(x-2).", course: "Combinez tout: domaine, limites, asymptotes, dérivée, variations.", inputLabel: "Analyse complète", validation: ()=>true, plotData:()=>[]},
+             { title: "Verrouillé"},{ title: "Verrouillé"},{ title: "Verrouillé"},{ title: "Verrouillé"},{ title: "Verrouillé"}
+        ];
+
+        // --- FONCTIONS DU JEU ---
+
+        function saveGameState() {
+            localStorage.setItem('mathecraftGameState', JSON.stringify(gameState));
+        }
+
+        function loadGameState() {
+            const savedState = localStorage.getItem('mathecraftGameState');
+            if (savedState) {
+                gameState = JSON.parse(savedState);
+            }
+        }
+
+        function showScreen(screen) {
+            startScreen.classList.add('hidden');
+            levelSelectScreen.classList.add('hidden');
+            gameContainer.classList.add('hidden');
+            screen.classList.remove('hidden');
+        }
+
+        function createLevelSelect() {
+            levelGrid.innerHTML = '';
+            levels.forEach((level, index) => {
+                const levelNum = index + 1;
+                const card = document.createElement('div');
+                card.classList.add('level-card');
+                card.dataset.level = levelNum;
+
+                let status = 'locked';
+                if (gameState.completedLevels.includes(levelNum)) status = 'completed';
+                else if (levelNum <= gameState.unlockedLevels) status = 'unlocked';
+                
+                if (status === 'locked' || level.title === "Verrouillé") {
+                    card.classList.add('locked');
+                    card.innerHTML = `<div class="level-number">?</div><div class="level-title">${level.title}</div>`;
+                } else {
+                     if (status === 'completed') card.classList.add('completed');
+                     card.innerHTML = `<div class="level-number">${levelNum}</div><div class="level-title">${level.title}</div>`;
+                     card.addEventListener('click', () => {
+                         loadLevel(levelNum);
+                     });
+                }
+                levelGrid.appendChild(card);
+            });
+        }
+        
+        function plotFunction(data) {
+            const plotOptions = {
+                target: '#plot-target',
+                width: document.getElementById('plot-container').clientWidth - 20,
+                height: document.getElementById('plot-container').clientHeight - 20,
+                grid: true,
+                xAxis: { label: 'x', domain: [-10, 10] },
+                yAxis: { label: 'y', domain: [-10, 10] },
+                data: data || []
+            };
+            try {
+                functionPlot(plotOptions);
+            } catch (e) {
+                console.error("Erreur de tracé:", e);
+                feedbackBox.textContent = "Erreur de syntaxe dans votre fonction.";
+                feedbackBox.className = 'error';
+                feedbackBox.style.display = 'block';
+            }
+        }
+
+        function loadLevel(levelNum) {
+            gameState.currentLevel = levelNum;
+            const levelData = levels[levelNum - 1];
+
+            levelTitle.textContent = `NIVEAU ${levelNum}: ${levelData.title}`;
+            missionObjective.textContent = levelData.mission;
+            courseContent.innerHTML = levelData.course;
+            inputLabel.innerHTML = levelData.inputLabel;
+            functionInput.placeholder = levelData.placeholder;
+            functionInput.value = '';
+            feedbackBox.style.display = 'none';
+            
+            showScreen(gameContainer);
+            // On attend que le conteneur soit visible pour calculer sa taille
+            setTimeout(() => plotFunction(levelData.plotData()), 100);
+        }
+
+        function checkAnswer() {
+            const levelNum = gameState.currentLevel;
+            const levelData = levels[levelNum - 1];
+            const userInput = functionInput.value;
+
+            if (levelData.validation(userInput)) {
+                // Succès
+                feedbackBox.textContent = "CORRECT ! Structure validée !";
+                feedbackBox.className = 'feedback-box success';
+                feedbackBox.style.display = 'block';
+
+                if (!gameState.completedLevels.includes(levelNum)) {
+                    gameState.completedLevels.push(levelNum);
+                }
+                if (levelNum === gameState.unlockedLevels && levelNum < levels.length) {
+                    gameState.unlockedLevels++;
+                }
+                saveGameState();
+                
+                setTimeout(() => showVictory(levelNum), 1500);
+
+            } else {
+                // Erreur
+                feedbackBox.textContent = "INCORRECT. Vérifiez vos calculs et votre syntaxe.";
+                feedbackBox.className = 'feedback-box error';
+                feedbackBox.style.display = 'block';
+                plotFunction(levelData.plotData(userInput)); // Affiche la tentative de l'utilisateur
+            }
+        }
+        
+        function showVictory(levelNum) {
+            const levelData = levels[levelNum - 1];
+            victoryTitle.textContent = `NIVEAU ${levelNum} TERMINÉ !`;
+            victoryMessage.textContent = `Excellent travail, Architecte ! Vous avez maîtrisé "${levelData.title}".`;
+            
+            if (levelNum >= levels.length || levels[levelNum].title === "Verrouillé") {
+                nextLevelButton.textContent = "RETOUR À LA CARTE";
+            } else {
+                nextLevelButton.textContent = "NIVEAU SUIVANT";
+            }
+
+            victoryModal.classList.add('show');
+        }
+
+        // --- ÉCOUTEURS D'ÉVÉNEMENTS ---
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('fade-out');
+            setTimeout(() => {
+                showScreen(levelSelectScreen);
+                createLevelSelect();
+            }, 500);
+        });
+
+        backToLevelsButton.addEventListener('click', () => {
+            showScreen(levelSelectScreen);
+            createLevelSelect();
+        });
+
+        submitButton.addEventListener('click', checkAnswer);
+        functionInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            } else {
+                const levelData = levels[gameState.currentLevel - 1];
+                if(levelData.inputLabel === "f(x) ="){
+                    plotFunction(levelData.plotData(functionInput.value));
+                }
+            }
+        });
+        
+        nextLevelButton.addEventListener('click', () => {
+            victoryModal.classList.remove('show');
+            const nextLevel = gameState.currentLevel + 1;
+            if (nextLevel <= gameState.unlockedLevels && nextLevel <= levels.length && levels[nextLevel-1].title !== "Verrouillé") {
+                loadLevel(nextLevel);
+            } else {
+                showScreen(levelSelectScreen);
+                createLevelSelect();
+            }
+        });
+        
+        window.addEventListener('resize', () => {
+            if (!gameContainer.classList.contains('hidden')) {
+                const levelData = levels[gameState.currentLevel - 1];
+                plotFunction(levelData.plotData(functionInput.value));
+            }
+        });
+
+        // --- INITIALISATION ---
+        loadGameState();
+        // showScreen(levelSelectScreen); // Pour le développement rapide
+        // createLevelSelect();
+    });
+    </script>
+</body>
+</html>

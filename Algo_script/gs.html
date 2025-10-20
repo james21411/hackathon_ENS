@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoScript Academy - Plateforme d'apprentissage algorithmique</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. Configuration Globale & Thème
+           ========================================================================== */
+        :root {
+            --primary: #6366F1;
+            --secondary: #EC4899;
+            --accent: #10B981;
+            --neutral: #94A3B8;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --border-color: #334155;
+            --text-light: #E2E8F0;
+
+            --font-sans: 'Inter', sans-serif;
+            --font-display: 'Poppins', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --block-start: #22c55e;
+            --block-variable: #f59e0b;
+            --block-operator: #14b8a6;
+            --block-condition: #8b5cf6;
+        }
+
+        /* Réinitialisation de base et styles globaux */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background-color: var(--background); color: var(--neutral); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        
+        /* ==========================================================================
+           2. Animations
+           ========================================================================== */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes line-flash {
+            0% { stroke: var(--text-light); stroke-width: 4px; }
+            50% { stroke: var(--primary); stroke-width: 5px; }
+            100% { stroke: var(--neutral); stroke-width: 2.5px; }
+        }
+
+        /* ==========================================================================
+           3. Structure & Composants Principaux
+           ========================================================================== */
+        .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+
+        /* --- Header --- */
+        .header { height: 4rem; background-color: var(--surface); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; flex-shrink: 0; }
+        .header .logo { display: flex; align-items: center; gap: 0.5rem; }
+        .header .logo .icon { color: var(--primary); width: 24px; height: 24px; }
+        .header .logo h1 { font-family: var(--font-display); font-size: 1.25rem; color: white; }
+        .header .level-info { text-align: center; }
+        .header #levelTitle { font-family: var(--font-display); color: var(--text-light); font-size: 1.1rem; }
+        .header #levelProgressText { font-size: 0.75rem; color: var(--neutral); margin-top: 2px; }
+        .header .profile-section { display: flex; align-items: center; gap: 1rem; }
+        .header .profile-section .icon-button { background: none; border: none; padding: 0.5rem; border-radius: 50%; cursor: pointer; transition: background-color 0.2s; }
+        .header .profile-section .icon-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .header .profile-section .icon { color: #CBD5E1; width: 24px; height: 24px; }
+        .header .profile-section .avatar { width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 2px solid var(--primary); }
+
+        /* --- Palette de Blocs (Gauche) --- */
+        .block-palette { width: 300px; background-color: var(--surface); border-right: 1px solid var(--border-color); padding: 1rem; overflow-y: auto; }
+        .block-category { margin-bottom: 1.5rem; }
+        .block-category-title { font-family: var(--font-display); font-weight: 700; font-size: 1.125rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-light); }
+        .draggable-block { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border-radius: 0.375rem; font-family: var(--font-mono); font-size: 0.875rem; color: white; cursor: grab; margin-bottom: 0.5rem; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid; }
+        .draggable-block:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+        .draggable-block .block-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+        /* --- Zone Centrale (Canvas) --- */
+        .center-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .main-canvas { flex: 1; background-color: var(--background); position: relative; overflow: auto; }
+        .main-canvas .grid-background { position: absolute; inset: 0; z-index: 0; }
+        .canvas-content-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #475569; z-index: 1; pointer-events: none; }
+        #connector-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; overflow: visible;}
+        .connector-line { stroke: var(--neutral); stroke-width: 2.5px; fill: none; transition: stroke 0.2s; }
+        .connector-line.flash { animation: line-flash 0.5s ease-out; }
+        .connector-line-ghost { stroke: var(--primary); stroke-width: 3px; fill: none; stroke-dasharray: 8 4; }
+
+        /* --- Blocs sur le Canvas --- */
+        .canvas-block { position: absolute; display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.375rem; font-family: var(--font-mono); font-size: 0.9rem; color: white; cursor: move; transition: transform 0.2s, box-shadow 0.2s, outline 0.2s; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); z-index: 20; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .canvas-block.executing-block { outline: 3px solid var(--secondary); box-shadow: 0 0 20px 5px var(--secondary); transform: scale(1.02); }
+        .block-input-field { background-color: var(--background); border: 1px solid var(--border-color); color: var(--text-light); font-family: var(--font-mono); padding: 4px 6px; border-radius: 4px; margin: 0 4px; min-width: 50px; text-align: center; user-select: text;}
+        
+        /* --- Points de Connexion --- */
+        .connector-point { width: 14px; height: 14px; background-color: var(--surface); border: 2px solid var(--neutral); border-radius: 50%; position: absolute; transform: translate(-50%, -50%); cursor: crosshair; z-index: 25; transition: all 0.2s; }
+        .connector-point:hover { background-color: var(--primary); border-color: white; transform: translate(-50%,-50%) scale(1.2); }
+        .connector-point.input { top: 0; left: 50%; }
+        .connector-point.output-flow { bottom: 0; left: 50%; }
+        .connector-point.output-true { bottom: 0; left: 25%; background-color: var(--accent); }
+        .connector-point.output-false { bottom: 0; left: 75%; background-color: var(--block-variable); }
+        .connector-point.output-loop-body { bottom: 0; left: 25%; background-color: #38bdf8; /* Couleur cyan pour la boucle */ }
+
+
+        /* --- Console (Bas) --- */
+        .execution-console { height: 200px; background-color: var(--surface); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; }
+        .console-header { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .console-header .title { font-family: var(--font-display); color: white; }
+        .console-header .controls { display: flex; gap: 0.5rem; }
+        .console-header .control-button { background: #2a3b51; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 0.375rem; transition: all 0.2s; cursor: pointer; color: var(--text-light); }
+        .console-header .control-button:hover { filter: brightness(1.2); }
+        .console-header .control-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .console-output { flex: 1; padding: 0.75rem; font-family: var(--font-mono); font-size: 0.875rem; overflow-y: auto; user-select: text; }
+        .console-output p { margin-bottom: 4px; }
+        .console-output .log-info { color: var(--neutral); }
+        .console-output .log-output { color: white; font-weight: bold; }
+        .console-output .log-success { color: var(--accent); font-weight: bold;}
+        .console-output .log-error { color: #F87171; font-weight: bold;}
+
+        /* --- Panneau de Droite --- */
+        .side-panel { width: 350px; background-color: var(--surface); border-left: 1px solid var(--border-color); padding: 1rem; display: flex; flex-direction: column; overflow-y: auto; }
+        .side-panel-title { font-weight: bold; color: white; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 1.25rem;}
+        .variables { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .var-item { background-color: var(--background); padding: 12px; border-radius: 6px; border-left: 3px solid var(--block-variable); transition: all 0.3s; }
+        .var-item.updated { background-color: #334155; transform: scale(1.05); }
+        .var-name { font-size: 0.9rem; color: var(--neutral); margin-bottom: 5px; font-weight: bold; }
+        .var-value { font-family: var(--font-mono); font-size: 1.1rem; word-break: break-all; color: var(--text-light); }
+        
+        /* --- Fenêtres Modales --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s; }
+        .modal-overlay.visible { display: flex; }
+        .modal-content { background-color: var(--surface); color: var(--text-light); padding: 2.5rem; border-radius: 1rem; width: 90%; max-width: 600px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-content h2 { font-family: var(--font-display); margin-bottom: 1rem; color: white;}
+        .modal-content h3 { font-family: var(--font-display); margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--primary); }
+        .modal-content ul { list-style: none; padding-left: 0; }
+        .modal-content li { background: var(--background); padding: 8px 12px; margin-bottom: 6px; border-radius: 4px;}
+        .modal-button { display: block; width: 100%; padding: 0.875rem; margin-top: 2rem; background-image: linear-gradient(to right, var(--primary), var(--secondary)); color: white; font-weight: bold; font-size: 1rem; border: none; border-radius: 0.5rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .modal-button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- ==================== HEADER ==================== -->
+        <header class="header">
+            <div class="logo">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.25 5.5a.75.75 0 0 0 0 1.5h15.5a.75.75 0 0 0 0-1.5H4.25Zm0 4a.75.75 0 0 0 0 1.5h9.5a.75.75 0 0 0 0-1.5h-9.5Zm0 4a.75.75 0 0 0 0 1.5h15.5a.75.75 0 0 0 0-1.5H4.25Zm0 4a.75.75 0 0 0 0 1.5h9.5a.75.75 0 0 0 0-1.5h-9.5Z"></path></svg>
+                <h1>AlgoScript Academy</h1>
+            </div>
+            <div class="level-info">
+                <h2 id="levelTitle">Chargement...</h2>
+                <p id="levelProgressText">Préparez-vous !</p>
+            </div>
+            <div class="profile-section">
+                <button class="icon-button" title="Objectifs du niveau" id="show-objectives-btn">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"></path></svg>
+                </button>
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=AlgoScript" alt="Avatar" class="avatar">
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- PANNEAU DE GAUCHE (PALETTE DE BLOCS) -->
+            <aside class="block-palette" id="block-palette"></aside>
+
+            <!-- ZONE CENTRALE (CANVAS & CONSOLE) -->
+            <div class="center-area">
+                <main class="main-canvas" id="canvas-area">
+                    <svg class="grid-background" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" opacity="0.3"/></pattern></defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                    </svg>
+                    <svg id="connector-svg"></svg>
+                    <div class="canvas-content-placeholder" id="canvas-placeholder"><h2>Débutez votre mission !</h2><p>Faites glisser les blocs de la palette ici.</p></div>
+                </main>
+                <footer class="execution-console">
+                    <div class="console-header">
+                        <span class="title">Console d'Exécution</span>
+                        <div class="controls">
+                            <button class="control-button" id="run-btn" title="Exécuter (F5)">▶ Exécuter</button>
+                            <button class="control-button" id="stop-btn" title="Arrêter (F8)" disabled>■ Arrêter</button>
+                        </div>
+                    </div>
+                    <div class="console-output" id="console-output"></div>
+                </footer>
+            </div>
+
+            <!-- PANNEAU DE DROITE (DÉBOGUEUR) -->
+            <aside class="side-panel">
+                 <h3 class="side-panel-title">État des Variables</h3>
+                <div class="variables" id="variables-display"><p><i>Lancez le programme pour voir les variables...</i></p></div>
+            </aside>
+        </div>
+    </div>
+    
+    <!-- ==================== FENÊTRES MODALES ==================== -->
+    <div id="levelModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modal-title">...</h2>
+            <p id="modal-objective">...</p>
+            <h3>Blocs Autorisés</h3>
+            <ul id="modal-blocks"></ul>
+            <button id="modal-start-btn" class="modal-button">Commencer !</button>
+        </div>
+    </div>
+    <div id="inputModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 id="inputModal-prompt">Saisie Requise</h2>
+            <input type="text" id="inputModal-field" class="block-input-field" style="width:100%; margin: 1.5rem 0; padding: .75rem; font-size:1.2rem;">
+            <button id="inputModal-submit" class="modal-button">Valider</button>
+        </div>
+    </div>
+
+<script>
+'use strict';
+document.addEventListener('DOMContentLoaded', () => {
+
+    const App = {
+        state: {
+            currentLevel: 0,
+            blocksOnCanvas: {},
+            connections: [],
+            nextBlockId: 0,
+            isDragging: false,
+            isConnecting: false,
+            connectionStartPoint: null,
+            isExecuting: false,
+            executionSpeed: 350, // Vitesse d'exécution légèrement accélérée
+        },
+        init() {
+            this.UI.init();
+            this.Levels.loadLevel(this.state.currentLevel);
+            this.Canvas.init();
+            this.Console.logInfo("Bienvenue sur AlgoScript Academy !");
+            this.Console.logInfo("Sélectionnez 'Commencer' dans la fenêtre d'objectifs.");
+        },
+        generateId(prefix) {
+            return `${prefix}_${this.state.nextBlockId++}`;
+        }
+    };
+
+    App.Levels = {
+        _levels: [
+            // SÉQUENCE 1 : BASES DE L'ALGORITHMIQUE
+            {
+                title: "Niveau 1 : Ma Première Variable",
+                objective: "Déclarer une variable nommée `age` et lui assigner la valeur numérique `15`. Ensuite, afficher le contenu de cette variable dans la console.",
+                authorizedBlocks: ['start', 'create-var', 'display-var'],
+                checkSolution: s => s.variables.age === 15 && s.output.includes(15)
+            },
+            {
+                title: "Niveau 2 : L'art de l'Addition",
+                objective: "Calculer le prix total de deux articles. Créez une variable `article1` (valeur `2500`) et `article2` (valeur `1500`). Calculez leur somme et stockez-la dans une variable `total`. Affichez le `total`.",
+                authorizedBlocks: ['start', 'create-var', 'operator-add', 'display-var'],
+                checkSolution: s => s.variables.total === 4000 && s.output.includes(4000)
+            },
+            {
+                title: "Niveau 3 : Interaction Utilisateur",
+                objective: "Demander à l'utilisateur d'entrer son nom via une boîte de dialogue. Stockez ce nom dans une variable `nomUtilisateur` et affichez-le.",
+                authorizedBlocks: ['start', 'read-input', 'display-var'],
+                checkSolution: s => s.hasOwnProperty('nomUtilisateur') && s.output.includes(s.variables.nomUtilisateur)
+            },
+            // SÉQUENCE 2 : OPÉRATEURS ET CALCULS
+            {
+                title: "Niveau 4 : Opérations Arithmétiques",
+                objective: "À partir d'un `score` initial de `100`, soustrayez `25` points de `penalite`, puis multipliez le résultat par un `multiplicateur` de `2`. Stockez le résultat final dans `scoreFinal` et affichez-le.",
+                authorizedBlocks: ['start', 'create-var', 'operator-subtract', 'operator-multiply', 'display-var'],
+                checkSolution: s => s.variables.score === 100 && s.variables.penalite === 25 && s.variables.multiplicateur === 2 && s.variables.scoreFinal === 150 && s.output.includes(150)
+            },
+            {
+                title: "Niveau 5 : Le Reste de la Division",
+                objective: "Demandez un nombre entier à l'utilisateur (`nombre`). Calculez le reste de la division de ce nombre par 2 et stockez-le dans `reste`. Affichez le `reste`. (Ceci est la base pour savoir si un nombre est pair ou impair).",
+                authorizedBlocks: ['start', 'read-input', 'create-var', 'operator-modulo', 'display-var'],
+                checkSolution: s => s.hasOwnProperty('nombre') && s.variables.reste === s.variables.nombre % 2 && s.output.includes(s.variables.reste)
+            },
+            // SÉQUENCE 3 : STRUCTURES CONDITIONNELLES
+            {
+                title: "Niveau 6 : Première Condition",
+                objective: "Demandez l'âge de l'utilisateur. Si l'âge est supérieur ou égal à 18, affichez le message \"Majeur\". Sinon, n'affichez rien.",
+                authorizedBlocks: ['start', 'read-input', 'create-var', 'operator-gte', 'condition-if', 'display-var'],
+                checkSolution: s => s.variables.age >= 18 ? s.output.includes("Majeur") : s.output.length === 0
+            },
+            {
+                title: "Niveau 7 : Condition Alternative (Si... Sinon...)",
+                objective: "Demandez une note sur 20. Si la note est supérieure ou égale à 10, affichez \"Admis\". Sinon, affichez \"Échoué\".",
+                authorizedBlocks: ['start', 'read-input', 'create-var', 'operator-gte', 'condition-if', 'display-var'],
+                checkSolution: s => s.variables.note >= 10 ? (s.output.includes("Admis") && !s.output.includes("Échoué")) : (s.output.includes("Échoué") && !s.output.includes("Admis"))
+            },
+            {
+                title: "Niveau 8 : Conditions Combinées",
+                objective: "Demandez une note. Si la note est entre 12 (inclus) et 14 (exclu), affichez \"Mention Assez Bien\". Vous aurez besoin de deux conditions : `note >= 12` ET `note < 14`.",
+                authorizedBlocks: ['start', 'read-input', 'create-var', 'operator-gte', 'operator-lt', 'operator-and', 'condition-if', 'display-var'],
+                checkSolution: s => {
+                    const note = s.variables.note;
+                    const conditionMet = note >= 12 && note < 14;
+                    return conditionMet ? s.output.includes("Mention Assez Bien") : s.output.length === 0;
+                }
+            },
+            // SÉQUENCE 4 : STRUCTURES ITÉRATIVES (BOUCLES)
+            {
+                title: "Niveau 9 : Ma Première Boucle",
+                objective: "Créez un compteur `i` initialisé à 1. Tant que `i` est inférieur ou égal à 5, affichez la valeur de `i`, puis incrémentez `i` de 1. La boucle doit s'arrêter après avoir affiché 5.",
+                authorizedBlocks: ['start', 'create-var', 'operator-lte', 'operator-add', 'loop-while', 'display-var'],
+                checkSolution: s => s.variables.i > 5 && s.output.join(',') === '1,2,3,4,5'
+            },
+            {
+                title: "Niveau 10 : Calcul d'une Somme",
+                objective: "Calculez la somme des 10 premiers entiers (de 1 à 10). Utilisez une boucle `Tant Que`, un `compteur` et une variable `somme` initialisée à 0. Affichez la `somme` finale (qui doit être 55).",
+                authorizedBlocks: ['start', 'create-var', 'operator-lte', 'operator-add', 'loop-while', 'display-var'],
+                checkSolution: s => s.variables.somme === 55 && s.output.includes(55)
+            },
+        ],
+        loadLevel(index) {
+            if (index >= this._levels.length) {
+                App.UI.showWinScreen();
+                return;
+            }
+            const level = this._levels[index];
+            App.state.currentLevel = index;
+            App.Canvas.clear();
+            App.UI.updateLevelInfo(level.title, `${index + 1}/${this._levels.length}`);
+            App.UI.showLevelModal(level);
+            this.populatePalette(level.authorizedBlocks);
+        },
+        nextLevel() { this.loadLevel(App.state.currentLevel + 1); },
+        getCurrentLevel() { return this._levels[App.state.currentLevel]; },
+        populatePalette(authorizedBlocks) {
+            const palette = document.getElementById('block-palette');
+            palette.innerHTML = '';
+            Object.values(App.Blocks.DEFINITIONS).forEach(category => {
+                const authorizedInCategory = category.blocks.filter(b => authorizedBlocks.includes(b.type));
+                if (authorizedInCategory.length > 0) {
+                    const categoryEl = document.createElement('div');
+                    categoryEl.className = 'block-category';
+                    categoryEl.innerHTML = `<h3 class="block-category-title" style="color:${category.color}; border-left: 3px solid ${category.color}; padding-left: 8px;">${category.icon} ${category.name}</h3>`;
+                    authorizedInCategory.forEach(blockDef => categoryEl.appendChild(App.UI.createDraggableBlock(blockDef)));
+                    palette.appendChild(categoryEl);
+                }
+            });
+        },
+    };
+
+    App.UI = {
+        elements: { runBtn: document.getElementById('run-btn'), stopBtn: document.getElementById('stop-btn'), canvasArea: document.getElementById('canvas-area'), consoleOutput: document.getElementById('console-output'), levelModal: document.getElementById('levelModal'), modalStartBtn: document.getElementById('modal-start-btn'), levelTitle: document.getElementById('levelTitle'), levelProgressText: document.getElementById('levelProgressText'), variablesDisplay: document.getElementById('variables-display'), connectorSvg: document.getElementById('connector-svg'), },
+        init() { this.elements.runBtn.addEventListener('click', () => App.Executor.run()); this.elements.stopBtn.addEventListener('click', () => App.Executor.stop()); this.elements.modalStartBtn.addEventListener('click', () => this.elements.levelModal.classList.remove('visible')); document.getElementById('show-objectives-btn').addEventListener('click', () => this.showLevelModal(App.Levels.getCurrentLevel())); document.addEventListener('keydown', (e) => { if(e.key === 'F5'){e.preventDefault(); this.elements.runBtn.click();} if(e.key === 'F8'){e.preventDefault(); this.elements.stopBtn.click();} }); },
+        createDraggableBlock(blockDef) {
+            const el = document.createElement('div'); el.className = 'draggable-block'; el.style.backgroundColor = blockDef.color; el.style.borderLeftColor = blockDef.color;
+            el.setAttribute('draggable', 'true'); el.dataset.type = blockDef.type; el.innerHTML = `<span style="font-size: 1.2em; line-height: 1;">${blockDef.icon || ''}</span> <span>${blockDef.label}</span>`;
+            el.addEventListener('dragstart', App.Canvas.handleDragStart); return el;
+        },
+        createCanvasBlock(type, x, y) {
+            const blockDef = App.Blocks.findDefinition(type); if (!blockDef) return null;
+            const blockId = App.generateId('block'); const el = document.createElement('div'); el.id = blockId; el.className = 'canvas-block'; el.style.left = `${x}px`; el.style.top = `${y}px`; el.style.backgroundColor = blockDef.color;
+            let label = blockDef.label; ['nom', 'valeur', 'var1', 'var2', 'résultat', 'condition'].forEach(p => label = label.replace('{}', `<input type="text" class="block-input-field" placeholder="${p}">`));
+            el.innerHTML = `<span style="font-size: 1.2em; line-height: 1; margin-right: 4px;">${blockDef.icon || ''}</span> <span>${label}</span>`; el.addEventListener('mousedown', App.Canvas.handleBlockMouseDown);
+            if (blockDef.connectors.input) el.appendChild(this.createConnectorPoint(blockId, 'input', 'input'));
+            if (blockDef.connectors.outputFlow) el.appendChild(this.createConnectorPoint(blockId, 'output', 'flow', 'output-flow'));
+            if (blockDef.connectors.outputTrue) el.appendChild(this.createConnectorPoint(blockId, 'output', 'true', 'output-true'));
+            if (blockDef.connectors.outputFalse) el.appendChild(this.createConnectorPoint(blockId, 'output', 'false', 'output-false'));
+            if (blockDef.connectors.outputLoopBody) el.appendChild(this.createConnectorPoint(blockId, 'output', 'loopBody', 'output-loop-body'));
+            this.elements.canvasArea.appendChild(el); App.state.blocksOnCanvas[blockId] = { el, type, connections: {} }; return el;
+        },
+        createConnectorPoint(blockId, type, name, className) {
+            const p = document.createElement('div'); p.className = `connector-point ${className || type}`;
+            Object.assign(p.dataset, { blockId, pointId: name, pointType: type });
+            p.addEventListener('mousedown', e => { e.stopPropagation(); App.Canvas.startConnection(e, p); });
+            p.addEventListener('mouseup', e => { e.stopPropagation(); App.Canvas.endConnection(e, p); });
+            return p;
+        },
+        updateAllConnections() {
+            this.elements.connectorSvg.innerHTML = ''; App.state.connections.forEach(conn => this.drawConnectionLine(conn.from, conn.to, conn.id));
+        },
+        drawConnectionLine(from, to, id) {
+            const fromP = document.querySelector(`[data-block-id='${from.blockId}'][data-point-id='${from.pointId}']`); const toP = document.querySelector(`[data-block-id='${to.blockId}'][data-point-id='${to.pointId}']`);
+            if (!fromP || !toP) return;
+            const canvasR = this.elements.canvasArea.getBoundingClientRect(); const fromR = fromP.getBoundingClientRect(); const toR = toP.getBoundingClientRect();
+            const [x1, y1] = [fromR.left + fromR.width / 2 - canvasR.left + this.elements.canvasArea.scrollLeft, fromR.top + fromR.height / 2 - canvasR.top + this.elements.canvasArea.scrollTop];
+            const [x2, y2] = [toR.left + toR.width / 2 - canvasR.left + this.elements.canvasArea.scrollLeft, toR.top + toR.height / 2 - canvasR.top + this.elements.canvasArea.scrollTop];
+            const pathStr = `M ${x1} ${y1} C ${x1} ${y1 + 60}, ${x2} ${y2 - 60}, ${x2} ${y2}`;
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path'); path.id = id; path.setAttribute('d', pathStr); path.setAttribute('class', 'connector-line');
+            this.elements.connectorSvg.appendChild(path);
+        },
+        updateLevelInfo(title, progress) { this.elements.levelTitle.textContent = title; this.elements.levelProgressText.textContent = `Niveau ${progress}`; },
+        toggleExecutionControls(isExecuting) { this.elements.runBtn.disabled = isExecuting; this.elements.stopBtn.disabled = !isExecuting; },
+        updateVariablesDisplay(vars) { this.elements.variablesDisplay.innerHTML = Object.keys(vars).length === 0 ? '<p><i>Aucune variable définie.</i></p>' : ''; Object.entries(vars).forEach(([name, value]) => { this.elements.variablesDisplay.innerHTML += `<div class="var-item"><span class="var-name">${name}</span><span class="var-value">${JSON.stringify(value)}</span></div>`; }); },
+        highlightBlock(id, toggle) { document.getElementById(id)?.classList.toggle('executing-block', toggle); },
+        highlightVariableUpdate(name) { Array.from(this.elements.variablesDisplay.children).find(el => el.querySelector('.var-name')?.textContent === name)?.classList.add('updated'); setTimeout(() => document.querySelector('.var-item.updated')?.classList.remove('updated'), 500); },
+        showLevelModal(level) {
+            document.getElementById('modal-title').textContent = level.title; document.getElementById('modal-objective').innerHTML = level.objective;
+            const list = document.getElementById('modal-blocks'); list.innerHTML = '';
+            level.authorizedBlocks.forEach(type => {
+                const blockDef = App.Blocks.findDefinition(type);
+                if(blockDef) list.innerHTML += `<li><strong>${blockDef.label}</strong></li>`;
+            });
+            this.elements.levelModal.classList.add('visible');
+        },
+        showWinScreen() { this.elements.levelModal.innerHTML = `<div class="modal-content" style="text-align:center;"><h2>🏆 Félicitations !</h2><p>Vous avez terminé tous les niveaux de l'AlgoScript Academy. Vous êtes un champion de l'algorithmique !</p></div>`; this.elements.levelModal.classList.add('visible'); },
+        promptForInput(message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('inputModal'); const field = document.getElementById('inputModal-field'); const btn = document.getElementById('inputModal-submit');
+                document.getElementById('inputModal-prompt').textContent = message; field.value = ''; modal.classList.add('visible'); field.focus();
+                const onValidate = e => { e.preventDefault(); modal.classList.remove('visible'); btn.removeEventListener('click', onValidate); resolve(isNaN(field.value) || field.value.trim() === '' ? field.value : parseFloat(field.value)); };
+                btn.onclick = onValidate;
+                field.onkeydown = e => { if (e.key === 'Enter') { onValidate(e); }};
+            });
+        },
+    };
+
+    App.Canvas = {
+        _offsetX: 0, _offsetY: 0, _currentMovingBlock: null,
+        init() { const c = App.UI.elements.canvasArea; c.addEventListener('dragover', e => e.preventDefault()); c.addEventListener('drop', this.handleDrop.bind(this)); document.addEventListener('mousemove', this.handleMouseMove.bind(this)); document.addEventListener('mouseup', this.handleMouseUp.bind(this)); },
+        clear() { App.state.blocksOnCanvas = {}; App.state.connections = []; App.UI.elements.canvasArea.querySelectorAll('.canvas-block').forEach(b => b.remove()); App.UI.updateAllConnections(); App.Console.clear(); App.UI.updateVariablesDisplay({}); document.getElementById('canvas-placeholder').style.display = 'block'; },
+        handleDragStart(e) { e.dataTransfer.setData('text/plain', e.target.dataset.type); },
+        handleDrop(e) {
+            e.preventDefault();
+            const canvasRect = App.UI.elements.canvasArea.getBoundingClientRect();
+            const x = e.clientX - canvasRect.left + App.UI.elements.canvasArea.scrollLeft;
+            const y = e.clientY - canvasRect.top + App.UI.elements.canvasArea.scrollTop;
+            App.UI.createCanvasBlock(e.dataTransfer.getData('text/plain'), x, y);
+            document.getElementById('canvas-placeholder').style.display = 'none';
+        },
+        handleBlockMouseDown(e) { if (e.target.classList.contains('connector-point') || e.target.tagName === 'INPUT') return; App.state.isDragging = true; this._currentMovingBlock = e.target.closest('.canvas-block'); const r = this._currentMovingBlock.getBoundingClientRect(); this._offsetX = e.clientX - r.left; this._offsetY = e.clientY - r.top; this._currentMovingBlock.style.zIndex = 100; },
+        handleMouseMove(e) { if (App.state.isDragging && this._currentMovingBlock) { const r = App.UI.elements.canvasArea.getBoundingClientRect(); this._currentMovingBlock.style.left = `${e.clientX - r.left - this._offsetX + App.UI.elements.canvasArea.scrollLeft}px`; this._currentMovingBlock.style.top = `${e.clientY - r.top - this._offsetY + App.UI.elements.canvasArea.scrollTop}px`; App.UI.updateAllConnections(); } if (App.state.isConnecting) { /* logiques de ligne fantôme ici si nécessaire */ } },
+        handleMouseUp() { if (App.state.isDragging) { this._currentMovingBlock.style.zIndex = 20; } this._currentMovingBlock = null; App.state.isDragging = false; if (App.state.isConnecting) this.resetConnectionState(); },
+        resetConnectionState() { App.state.isConnecting = false; App.state.connectionStartPoint = null; },
+        startConnection(e, p) { App.state.isConnecting = true; App.state.connectionStartPoint = { blockId: p.dataset.blockId, pointId: p.dataset.pointId, type: p.dataset.pointType }; },
+        endConnection(e, endP) {
+            const start = App.state.connectionStartPoint;
+            if (!App.state.isConnecting || !start || start.type !== 'output' || endP.dataset.pointType !== 'input' || start.blockId === endP.dataset.blockId) { this.resetConnectionState(); return; }
+            const newConn = { id: App.generateId('conn'), from: { blockId: start.blockId, pointId: start.pointId }, to: { blockId: endP.dataset.blockId, pointId: endP.dataset.pointId } };
+            App.state.connections = App.state.connections.filter(c => !(c.from.blockId === newConn.from.blockId && c.from.pointId === newConn.from.pointId));
+            App.state.connections.push(newConn); App.state.blocksOnCanvas[newConn.from.blockId].connections[newConn.from.pointId] = newConn.to.blockId;
+            App.UI.updateAllConnections(); const path = document.getElementById(newConn.id); if (path) { path.classList.add('flash'); setTimeout(() => path.classList.remove('flash'), 500); }
+            this.resetConnectionState();
+        },
+    };
+
+    App.Blocks = {
+        DEFINITIONS: {
+            start: { name: "Flux de Contrôle", color: 'var(--block-start)', icon: '▶️', blocks: [{ type: 'start', label: 'Démarrer', icon: '🏁', connectors: { input: false, outputFlow: true }}] },
+            variables: { name: "Variables et Entrées/Sorties", color: 'var(--block-variable)', icon: '📦',
+                blocks: [
+                    { type: 'create-var', label: "Définir variable '{}' avec valeur {}", icon: '✏️', connectors: { input: true, outputFlow: true } },
+                    { type: 'read-input', label: "Demander et stocker dans {}", icon: '⌨️', connectors: { input: true, outputFlow: true } },
+                    { type: 'display-var', label: "Afficher la variable ou valeur {}", icon: '📺', connectors: { input: true, outputFlow: true } }
+                ]
+            },
+            operators: { name: "Opérateurs Arithmétiques", color: 'var(--block-operator)', icon: '🧮',
+                blocks: [
+                    { type: 'operator-add', label: "{} + {} ➜ {}", icon: '➕', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-subtract', label: "{} - {} ➜ {}", icon: '➖', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-multiply', label: "{} * {} ➜ {}", icon: '✖️', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-divide', label: "{} / {} ➜ {}", icon: '➗', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-modulo', label: "{} % {} ➜ {}", icon: '％', connectors: { input: true, outputFlow: true } },
+                ]
+            },
+            conditions: { name: "Logique et Conditions", color: 'var(--block-condition)', icon: '🧭',
+                blocks: [
+                    { type: 'operator-eq', label: "{} == {} ➜ {}", icon: '＝', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-neq', label: "{} != {} ➜ {}", icon: '≠', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-gt', label: "{} > {} ➜ {}", icon: '>', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-lt', label: "{} < {} ➜ {}", icon: '<', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-gte', label: "{} >= {} ➜ {}", icon: '≥', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-lte', label: "{} <= {} ➜ {}", icon: '≤', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-and', label: "{} ET {} ➜ {}", icon: '∧', connectors: { input: true, outputFlow: true } },
+                    { type: 'operator-or', label: "{} OU {} ➜ {}", icon: '∨', connectors: { input: true, outputFlow: true } },
+                    { type: 'condition-if', label: "Si {} est VRAI", icon: '❓', connectors: { input: true, outputTrue: true, outputFalse: true } }
+                ]
+            },
+            loops: { name: "Boucles", color: '#38bdf8', icon: '🔁',
+                blocks: [
+                    { type: 'loop-while', label: "Tant que {} est VRAI", icon: '🔄', connectors: { input: true, outputLoopBody: true, outputFlow: true } }
+                ]
+            }
+        },
+        findDefinition(type) { for (const cat of Object.values(this.DEFINITIONS)) { const block = cat.blocks.find(b => b.type === type); if (block) return { ...block, color: cat.color }; } return null; }
+    };
+
+    App.Console = { _log(msg, c) { const p = document.createElement('p'); p.textContent = msg; if(c) p.className=c; const o=App.UI.elements.consoleOutput; o.appendChild(p); o.scrollTop=o.scrollHeight;}, clear(){ App.UI.elements.consoleOutput.innerHTML = ''; }, logInfo(msg) { this._log(`> ${msg}`, 'log-info');}, logOutput(msg) { this._log(String(msg), 'log-output');}, logSuccess(msg) { this._log(`✔ ${msg}`, 'log-success');}, logError(msg) { this._log(`✖ ERREUR: ${msg}`, 'log-error');}, };
+
+    App.Executor = {
+        _programState: {},
+        async run() { if (App.state.isExecuting) return; App.state.isExecuting = true; App.UI.toggleExecutionControls(true); App.Console.clear(); App.Console.logInfo("Démarrage de l'exécution...");
+            this._programState = { variables: {}, output: [], stopRequested: false, executionCounter: 0, maxSteps: 500 }; App.UI.updateVariablesDisplay({});
+            const startBlockId = Object.keys(App.state.blocksOnCanvas).find(id => App.state.blocksOnCanvas[id].type === 'start');
+            if (!startBlockId) { App.Console.logError("Bloc 'Démarrer' introuvable. Impossible de lancer le programme."); this.stop(); return; }
+            for (let currentBlockId = startBlockId; currentBlockId && !this._programState.stopRequested; ) {
+                if(this._programState.executionCounter++ > this._programState.maxSteps) { App.Console.logError("Limite d'exécution atteinte. Vérifiez vos boucles !"); break; }
+                App.UI.highlightBlock(currentBlockId, true);
+                const lineId = App.state.connections.find(c => c.to.blockId === currentBlockId)?.id;
+                if(lineId) document.getElementById(lineId)?.classList.add('flash');
+                await new Promise(r => setTimeout(r, App.state.executionSpeed));
+                const result = await this.executeBlock(currentBlockId);
+                App.UI.highlightBlock(currentBlockId, false);
+                if(lineId) setTimeout(()=>document.getElementById(lineId)?.classList.remove('flash'), 500);
+                if (result.error) { App.Console.logError(result.error); break; }
+                currentBlockId = result.nextBlockId;
+            }
+            if (!this._programState.stopRequested) { App.Console.logInfo("Exécution terminée."); this.checkSolution(); } else { App.Console.logError("Exécution interrompue par l'utilisateur."); }
+            this.stop();
+        },
+        stop() { this._programState.stopRequested = true; App.state.isExecuting = false; App.UI.toggleExecutionControls(false); document.querySelectorAll('.executing-block').forEach(b => b.classList.remove('executing-block')); },
+        getValue(input) {
+            const trimmedInput = String(input).trim();
+            if (this._programState.variables.hasOwnProperty(trimmedInput)) {
+                return this._programState.variables[trimmedInput];
+            }
+            if (trimmedInput.toLowerCase() === 'true') return true;
+            if (trimmedInput.toLowerCase() === 'false') return false;
+            if (trimmedInput !== '' && !isNaN(Number(trimmedInput))) {
+                return parseFloat(trimmedInput);
+            }
+            return trimmedInput; // Retourne comme une chaîne si ce n'est rien d'autre
+        },
+        async executeBlock(id) {
+            const block = App.state.blocksOnCanvas[id];
+            if (!block) return { error: `Bloc avec ID ${id} non trouvé.` };
+            const inputs = Array.from(block.el.querySelectorAll('input')).map(i => i.value);
+            let next = block.connections.flow;
+            try {
+                const requireName = (name, pos = "de destination") => { if (!name || !name.trim()) throw Error(`Le nom de la variable ${pos} est manquant.`); };
+                switch (block.type) {
+                    case 'start': break;
+                    case 'create-var': { const [name, value] = inputs; requireName(name, "à créer"); this._programState.variables[name.trim()] = this.getValue(value); App.UI.highlightVariableUpdate(name.trim()); break; }
+                    case 'display-var': { const val = this.getValue(inputs[0]); this._programState.output.push(val); App.Console.logOutput(val); break; }
+                    case 'read-input': { const name = inputs[0].trim(); requireName(name); this._programState.variables[name] = await App.UI.promptForInput(`Veuillez entrer une valeur pour '${name}' :`); App.UI.highlightVariableUpdate(name); break; }
+                    
+                    case 'operator-add': case 'operator-subtract': case 'operator-multiply': case 'operator-divide': case 'operator-modulo':
+                    case 'operator-eq': case 'operator-neq': case 'operator-gt': case 'operator-lt': case 'operator-gte': case 'operator-lte':
+                    case 'operator-and': case 'operator-or': {
+                        const [op1, op2, dest] = inputs; requireName(dest.trim());
+                        const v1 = this.getValue(op1), v2 = this.getValue(op2);
+                        let res;
+                        switch(block.type) {
+                            case 'operator-add': res = v1 + v2; break;
+                            case 'operator-subtract': res = v1 - v2; break;
+                            case 'operator-multiply': res = v1 * v2; break;
+                            case 'operator-divide': if(v2 === 0) throw Error("Division par zéro !"); res = v1 / v2; break;
+                            case 'operator-modulo': if(v2 === 0) throw Error("Division par zéro (modulo) !"); res = v1 % v2; break;
+                            case 'operator-eq': res = v1 == v2; break;
+                            case 'operator-neq': res = v1 != v2; break;
+                            case 'operator-gt': res = v1 > v2; break;
+                            case 'operator-lt': res = v1 < v2; break;
+                            case 'operator-gte': res = v1 >= v2; break;
+                            case 'operator-lte': res = v1 <= v2; break;
+                            case 'operator-and': res = v1 && v2; break;
+                            case 'operator-or': res = v1 || v2; break;
+                        }
+                        this._programState.variables[dest.trim()] = res; App.UI.highlightVariableUpdate(dest.trim()); break;
+                    }
+                    
+                    case 'condition-if': { const condition = this.getValue(inputs[0]); next = condition ? block.connections.true : block.connections.false; break; }
+                    case 'loop-while': { const condition = this.getValue(inputs[0]); next = condition ? block.connections.loopBody : block.connections.flow; break; }
+
+                    default: throw Error(`Logique d'exécution pour le bloc '${block.type}' non implémentée.`);
+                }
+            } catch (e) {
+                return { error: e.message };
+            }
+            App.UI.updateVariablesDisplay(this._programState.variables);
+            return { nextBlockId: next };
+        },
+        checkSolution() {
+            const level = App.Levels.getCurrentLevel();
+            try {
+                if (level.checkSolution(this._programState)) {
+                    App.Console.logSuccess("Objectif atteint ! Passage au niveau suivant...");
+                    setTimeout(() => App.Levels.nextLevel(), 2500);
+                } else {
+                    App.Console.logError("Objectif non atteint. Analysez la sortie et vos variables, puis réessayez.");
+                }
+            } catch (e) {
+                App.Console.logError(`Erreur lors de la vérification de la solution : ${e.message}`);
+            }
+        }
+    };
+
+    App.init();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Les Mystères des Ondes - Physique Interactive</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="wave-physics-app">
+        <!-- Page d'Accueil -->
+        <div id="home-section" class="section active">
+            <div class="home-content">
+                <div class="hero-container">
+                    <div class="hero-background"></div>
+                    <div class="hero-content">
+                        <h1 class="hero-title">🌊 Les Mystères des Ondes</h1>
+                        <p class="hero-subtitle">Découvrez les secrets des interférences et ondes stationnaires</p>
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <span class="stat-number" id="score-display">0</span>
+                                <span class="stat-label">Points</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="level-display">1</span>
+                                <span class="stat-label">Niveau</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modules-grid">
+                    <div class="module-card" data-module="lab">
+                        <div class="module-icon">🔬</div>
+                        <h3>Laboratoire Virtuel</h3>
+                        <p>Expérimentez avec les paramètres des ondes</p>
+                    </div>
+                    
+                    <div class="module-card" data-module="theory">
+                        <div class="module-icon">📚</div>
+                        <h3>Théorie Interactive</h3>
+                        <p>Comprenez les concepts fondamentaux</p>
+                    </div>
+                    
+                    <div class="module-card" data-module="music">
+                        <div class="module-icon">🎵</div>
+                        <h3>Studio Musical</h3>
+                        <p>Applications dans la musique</p>
+                    </div>
+                    
+                    <div class="module-card" data-module="quiz">
+                        <div class="module-icon">🎯</div>
+                        <h3>Quiz Défis</h3>
+                        <p>Testez vos connaissances</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Laboratoire Virtuel -->
+        <div id="lab-section" class="section">
+            <div class="section-header">
+                <h2>🔬 Laboratoire Virtuel</h2>
+                <button class="back-btn" data-back="home">← Retour</button>
+            </div>
+            
+            <div class="lab-content">
+                <div class="controls-panel">
+                    <h3>Contrôles des Ondes</h3>
+                    
+                    <div class="wave-controls">
+                        <h4>🔴 Onde 1</h4>
+                        <div class="control-group">
+                            <label>Fréquence: <span id="freq1-value">2.0</span></label>
+                            <input type="range" id="freq1" min="0.5" max="5" step="0.1" value="2">
+                        </div>
+                        <div class="control-group">
+                            <label>Amplitude: <span id="amp1-value">50</span></label>
+                            <input type="range" id="amp1" min="10" max="100" value="50">
+                        </div>
+                    </div>
+
+                    <div class="wave-controls">
+                        <h4>🔵 Onde 2</h4>
+                        <div class="control-group">
+                            <label>Fréquence: <span id="freq2-value">2.5</span></label>
+                            <input type="range" id="freq2" min="0.5" max="5" step="0.1" value="2.5">
+                        </div>
+                        <div class="control-group">
+                            <label>Amplitude: <span id="amp2-value">40</span></label>
+                            <input type="range" id="amp2" min="10" max="100" value="40">
+                        </div>
+                    </div>
+
+                    <div class="presets">
+                        <h4>Configurations Prédéfinies</h4>
+                        <button id="constructive-btn">Interférence Constructive</button>
+                        <button id="destructive-btn">Interférence Destructive</button>
+                    </div>
+                </div>
+
+                <div class="visualization-panel">
+                    <h3>Visualisation en Temps Réel</h3>
+                    <canvas id="wave-canvas" width="800" height="400"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #ff6b6b;"></span>
+                            Onde 1
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #4ecdc4;"></span>
+                            Onde 2
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #ffd93d;"></span>
+                            Onde Résultante
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Théorie Interactive -->
+        <div id="theory-section" class="section">
+            <div class="section-header">
+                <h2>📚 Théorie Interactive</h2>
+                <button class="back-btn" data-back="home">← Retour</button>
+            </div>
+            
+            <div class="theory-content">
+                <div class="concept-card">
+                    <h3>🌊 Qu'est-ce qu'une Interférence ?</h3>
+                    <p>
+                        Lorsque deux ondes se rencontrent, elles se superposent pour créer un nouveau motif d'onde. 
+                        Ce phénomène s'appelle l'interférence.
+                    </p>
+                    <div class="concept-types">
+                        <div class="type-card constructive">
+                            <h4>✅ Interférence Constructive</h4>
+                            <p>Les ondes s'additionnent → Amplitude augmentée</p>
+                        </div>
+                        <div class="type-card destructive">
+                            <h4>❌ Interférence Destructive</h4>  
+                            <p>Les ondes s'annulent → Amplitude réduite</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <h3>📏 Les Ondes Stationnaires</h3>
+                    <p>
+                        Quand deux ondes de même fréquence se propagent en sens opposé, 
+                        elles créent une onde stationnaire avec des points fixes.
+                    </p>
+                    <div class="stationary-elements">
+                        <div class="element">
+                            <strong>Nœuds:</strong> Points immobiles (amplitude = 0)
+                        </div>
+                        <div class="element">
+                            <strong>Ventres:</strong> Points d'amplitude maximale
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🎵 Applications Pratiques</h3>
+                    <ul>
+                        <li>🎸 Cordes de guitare et piano</li>
+                        <li>🎺 Instruments à vent</li>
+                        <li>🔊 Annulation de bruit (casques)</li>
+                        <li>📡 Technologies de communication</li>
+                        <li>🌊 Phénomènes naturels (marées, séismes)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Studio Musical -->
+        <div id="music-section" class="section">
+            <div class="section-header">
+                <h2>🎵 Studio Musical</h2>
+                <button class="back-btn" data-back="home">← Retour</button>
+            </div>
+            
+            <div class="music-content">
+                <div class="instrument-demo">
+                    <h3>🎸 Comment ça marche dans la musique ?</h3>
+                    
+                    <div class="demo-cards">
+                        <div class="demo-card">
+                            <h4>Corde de Guitare</h4>
+                            <p>
+                                Une corde vibrante crée des ondes stationnaires. 
+                                La longueur de la corde détermine la note jouée !
+                            </p>
+                            <div class="frequency-demo">
+                                <strong>Fréquences des Notes:</strong>
+                                <div>Do: 261.6 Hz</div>
+                                <div>Ré: 293.7 Hz</div>
+                                <div>Mi: 329.6 Hz</div>
+                            </div>
+                        </div>
+
+                        <div class="demo-card">
+                            <h4>Harmoniques</h4>
+                            <p>
+                                Les instruments produisent plusieurs fréquences simultanément, 
+                                créant le timbre unique de chaque instrument.
+                            </p>
+                        </div>
+
+                        <div class="demo-card">
+                            <h4>Résonance</h4>
+                            <p>
+                                Les corps des instruments amplifient certaines fréquences 
+                                grâce aux ondes stationnaires dans leur cavité.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>🎛️ Créateur d'Harmoniques</h3>
+                    <p>Ajustez les fréquences pour entendre différents accords !</p>
+                    <div class="harmonic-controls">
+                        <button id="octave-btn">Octave (1:2)</button>
+                        <button id="fifth-btn">Quinte (2:3)</button>
+                        <button id="fourth-btn">Quarte (3:4)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz -->
+        <!-- La classe 'active' a été retirée ici pour que le quiz ne s'affiche pas par défaut -->
+        <!-- <div id="quiz-section" class="section quiz-overlay">
+            <div class="quiz-modal" id="quiz-modal">
+                <div class="quiz-header">
+                    <h2>🎯 Quiz Défis - Question <span id="question-number">1</span></h2>
+                    <button class="close-quiz" onclick="hideQuiz()">×</button>
+                </div>
+                
+                <div class="quiz-content">
+                    <div class="question">
+                        <h3 id="question-text">Que se passe-t-il quand deux ondes de même fréquence et amplitude se rencontrent en phase ?</h3>
+                    </div>
+                    
+                    <div class="options" id="quiz-options">
+                        <button class="option">Elles s'annulent</button>
+                        <button class="option">Elles s'amplifient (interférence constructive)</button>
+                        <button class="option">Elles restent identiques</button>
+                        <button class="option">Elles changent de fréquence</button>
+                    </div>
+                    
+                    <div class="result" id="quiz-result" style="display: none;">
+                        <!-- Résultat sera affiché ici -->
+                    <!-- </div>
+                </div>
+                
+                <div class="quiz-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p><span id="current-question">1</span> / <span id="total-questions">3</span></p>
+                </div>
+            </div>
+        </div> --> -->
+
+        <!-- Score Flottant -->
+        <div class="floating-score">
+            Score: <span id="floating-score">0</span> | Niveau: <span id="floating-level">1</span>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>

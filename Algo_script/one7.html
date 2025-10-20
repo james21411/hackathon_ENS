@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voyage au cœur des chocs | Physique Terminale</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        
+        .experiment-canvas {
+            background: radial-gradient(circle, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+        
+        .highlight {
+            background: linear-gradient(90deg, rgba(56, 182, 255, 0.1) 0%, rgba(54, 162, 235, 0.2) 100%);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .collision-simulator {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ball {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            user-select: none;
+        }
+        
+        .progress-tracker {
+            position: relative;
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
+            transition: width 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-16 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                    Les mystères des <span class="text-yellow-300">chocs</span> en physique
+                </h1>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-8">
+                    Découvrez les secrets des collisions et maîtrisez la conservation de la quantité de mouvement à travers des expériences interactives captivantes.
+                </p>
+                
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4766b733-8300-4ae9-a563-f8c04c0591f3.png" alt="Illustration scientifique de collisions élastiques et inélastiques avec des billes colorées représentant les transferts d'énergie et de quantité de mouvement" class="mx-auto rounded-xl shadow-2xl mb-8" />
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="startLearning()" class="px-8 py-4 bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold rounded-full text-lg transition-all transform hover:scale-105">
+                        Commencer l'aventure
+                    </button>
+                    <button onclick="scrollToExperiment()" class="px-8 py-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-bold rounded-full text-lg transition-all transform hover:scale-105">
+                        Essayer le simulateur
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Learning Path -->
+        <section id="learning-path" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Parcours d'apprentissage
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto text-lg">
+                    Suivez ces étapes pour maîtriser les concepts clés des chocs en physique
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="step-card bg-white rounded-xl p-6 shadow-lg">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-blue-600 text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Découverte des chocs</h3>
+                    <p class="text-gray-600 mb-4">
+                        Comprendre ce qu'est un choc et découvrir les différentes catégories : élastiques et inélastiques.
+                    </p>
+                    <button onclick="showStep(1)" class="text-blue-600 font-medium hover:text-blue-800 transition-colors">
+                        Explorer →
+                    </button>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-card bg-white rounded-xl p-6 shadow-lg">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-blue-600 text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Quantité de mouvement</h3>
+                    <p class="text-gray-600 mb-4">
+                        Apprendre à calculer la quantité de mouvement et comprendre pourquoi elle se conserve pendant un choc.
+                    </p>
+                    <button onclick="showStep(2)" class="text-blue-600 font-medium hover:text-blue-800 transition-colors">
+                        Découvrir →
+                    </button>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step-card bg-white rounded-xl p-6 shadow-lg">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-blue-600 text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Applications réelles</h3>
+                    <p class="text-gray-600 mb-4">
+                        Explorer des exemples concrets comme les accidents de voiture ou le sport pour relier à la vie quotidienne.
+                    </p>
+                    <button onclick="showStep(3)" class="text-blue-600 font-medium hover:text-blue-800 transition-colors">
+                        Appliquer →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Progress Tracker -->
+            <div class="mt-16 bg-white rounded-xl p-6 shadow-lg">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Votre progression</h3>
+                <div class="progress-tracker mt-4">
+                    <div id="progress-bar" class="progress-bar" style="width: 10%;"></div>
+                </div>
+                <p class="text-gray-600 mt-2 text-sm">10% complété</p>
+            </div>
+        </section>
+        
+        <!-- Interactive Experiment Section -->
+        <section id="experiment" class="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                        Laboratoire virtuel
+                    </h2>
+                    <p class="text-gray-600 max-w-3xl mx-auto text-lg">
+                        Explorez les principes des chocs à travers ce simulateur interactif
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <div class="experiment-canvas p-4">
+                            <div class="collision-simulator" id="simulator">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5424bdaf-4728-4462-95b1-dbae0c2d3b95.png" alt="Simulation de collision interactive avec deux sphères colorées démontrant les transferts d'énergie et de quantité de mouvement" id="simulation-visual" class="w-full h-full object-contain" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-white rounded-xl p-6 shadow-lg h-full">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Paramètres du simulateur</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Type de choc</label>
+                                    <select id="collision-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="elastic">Élastique</option>
+                                        <option value="inelastic">Inélastique</option>
+                                        <option value="perfectly-inelastic">Parfaitement inélastique</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-2">Masse A (kg)</label>
+                                        <input type="range" id="mass-a" min="1" max="10" value="2" class="w-full" oninput="updateMassA(this.value)">
+                                        <div class="text-center text-gray-600" id="mass-a-value">2 kg</div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-2">Masse B (kg)</label>
+                                        <input type="range" id="mass-b" min="1" max="10" value="4" class="w-full" oninput="updateMassB(this.value)">
+                                        <div class="text-center text-gray-600" id="mass-b-value">4 kg</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-2">Vitesse A (m/s)</label>
+                                        <input type="range" id="velocity-a" min="-10" max="10" value="5" class="w-full" oninput="updateVelocityA(this.value)">
+                                        <div class="text-center text-gray-600" id="velocity-a-value">5 m/s</div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-2">Vitesse B (m/s)</label>
+                                        <input type="range" id="velocity-b" min="-10" max="10" value="-2" class="w-full" oninput="updateVelocityB(this.value)">
+                                        <div class="text-center text-gray-600" id="velocity-b-value">-2 m/s</div>
+                                    </div>
+                                </div>
+                                
+                                <button onclick="runSimulation()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                                    Lancer la simulation
+                                </button>
+                                
+                                <button onclick="resetSimulation()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors">
+                                    Réinitialiser
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Panel -->
+                <div class="mt-8 bg-white rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Analyse des résultats</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-blue-800 mb-2">Quantité de mouvement</h4>
+                            <div class="text-2xl font-bold text-blue-600" id="momentum-before">Avant : 2 kg·m/s</div>
+                            <div class="text-2xl font-bold text-blue-600" id="momentum-after">Après : 2 kg·m/s</div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-green-800 mb-2">Énergie cinétique</h4>
+                            <div class="text-2xl font-bold text-green-600" id="energy-before">Avant : 29 J</div>
+                            <div class="text-2xl font-bold text-green-600" id="energy-after">Après : 29 J</div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-yellow-800 mb-2">Vitesses finales</h4>
+                            <div class="text-2xl font-bold text-yellow-600" id="velocity-a-final">A : 1.67 m/s</div>
+                            <div class="text-2xl font-bold text-yellow-600" id="velocity-b-final">B : 3.33 m/s</div>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-purple-800 mb-2">Transfert</h4>
+                            <div class="text-2xl font-bold text-purple-600" id="momentum-transfer">Δp : 6.67 kg·m/s</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-slate-100 p-4 rounded-lg">
+                        <h4 class="font-medium text-slate-800 mb-2">Explications</h4>
+                        <p class="text-slate-700" id="explanation">
+                            Dans un choc élastique, la quantité de mouvement totale et l'énergie cinétique totale sont conservées. Les vitesses finales sont calculées à partir des équations de conservation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Real World Examples -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Les chocs dans la vie réelle
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto text-lg">
+                    Comprenez comment ces concepts s'appliquent dans des situations quotidiennes
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Example 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/221965d7-6a18-498f-ac0d-7925c63f3444.png" alt="Accident de voiture avec déformation des véhicules illustrant le transfert d'énergie lors d'un choc inélastique" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Sécurité automobile</h3>
+                        <p class="text-gray-600 mb-4">
+                            Les zones de déformation des voitures sont conçues pour absorber l'énergie lors d'un choc, réduisant les forces sur les passagers. Un excellent exemple de choc inélastique.
+                        </p>
+                        <button class="text-blue-600 font-medium hover:text-blue-800 transition-colors" onclick="showDetail('car')">
+                            Voir l'analyse →
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Example 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4d2189e5-5599-4eeb-ad93-93bc2caabd90.png" alt="Match de billard avec boules en mouvement démontrant les collisions élastiques presque parfaites" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Jeu de billard</h3>
+                        <p class="text-gray-600 mb-4">
+                            Les collisions entre les boules de billard sont presque parfaitement élastiques, ce qui permet aux joueurs de calculer précisément les angles de rebond.
+                        </p>
+                        <button class="text-blue-600 font-medium hover:text-blue-800 transition-colors" onclick="showDetail('pool')">
+                            Explorer les détails →
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Example 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/42a6bd3a-85b8-4967-937b-28b6916c8e57.png" alt="Athlète réalisant un saut en longueur avec analyse des forces et de l'impulsion au décollage" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Sports athlétiques</h3>
+                        <p class="text-gray-600 mb-4">
+                            Les athlètes utilisent les principes d'impulsion et de collision pour maximiser leurs performances, comme lors d'un saut en longueur ou d'un lancer.
+                        </p>
+                        <button class="text-blue-600 font-medium hover:text-blue-800 transition-colors" onclick="showDetail('sports')">
+                            En savoir plus →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Quiz Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4">
+                        Testez vos connaissances
+                    </h2>
+                    <p class="text-gray-300 max-w-3xl mx-auto text-lg">
+                        Un petit quiz pour vérifier que vous avez bien compris les concepts clés
+                    </p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-8 max-w-3xl mx-auto">
+                    <div id="quiz-container">
+                        <div class="quiz-step active" id="quiz-step-1">
+                            <h3 class="text-xl font-bold mb-6">Question 1/5</h3>
+                            <p class="text-lg mb-6">Dans un choc parfaitement inélastique entre deux objets :</p>
+                            
+                            <div class="space-y-3">
+                                <div class="quiz-option bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors" onclick="checkAnswer(this, false)">
+                                    L'énergie cinétique est conservée mais pas la quantité de mouvement
+                                </div>
+                                <div class="quiz-option bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors" onclick="checkAnswer(this, true)">
+                                    Les deux objets restent collés après le choc
+                                </div>
+                                <div class="quiz-option bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors" onclick="checkAnswer(this, false)">
+                                    Il n'y a aucun transfert d'énergie
+                                </div>
+                                <div class="quiz-option bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors" onclick="checkAnswer(this, false)">
+                                    La quantité de mouvement n'est pas conservée
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- More quiz steps would be here, removed for brevity -->
+                    </div>
+                    
+                    <div class="mt-8 flex justify-between">
+                        <button id="quiz-prev" class="px-6 py-2 bg-gray-700 text-white rounded-lg opacity-50 cursor-not-allowed" disabled>
+                            Précédent
+                        </button>
+                        <button id="quiz-next" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                            Suivant
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Conclusion -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-100 to-blue-50">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+                    Vous êtes maintenant un expert des chocs!
+                </h2>
+                <p class="text-xl text-gray-600 mb-8">
+                    Les principes des chocs et de la conservation de la quantité de mouvement sont fondamentaux en physique et ont des applications dans de nombreux domaines.
+                </p>
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/41dbfb8c-5d2f-4150-8565-194eb6e76ca0.png" alt="Illustration de félicitations avec un trophée et des éléments scientifiques représentant la réussite dans l'apprentissage des concepts de physique" class="mx-auto rounded-xl mb-8 w-full max-w-lg" />
+                <button onclick="restartLearning()" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full text-lg transition-all transform hover:scale-105">
+                    Recommencer le parcours
+                </button>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Simulator variables
+        let balls = [];
+        let simulationRunning = false;
+        let currentCollisionType = 'elastic';
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSimulator();
+            updateProgress(10);
+        });
+        
+        // Navigation functions
+        function startLearning() {
+            document.getElementById('learning-path').scrollIntoView({ behavior: 'smooth' });
+            updateProgress(20);
+        }
+        
+        function scrollToExperiment() {
+            document.getElementById('experiment').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function showStep(step) {
+            // In a real implementation, this would show detailed content for each step
+            alert(`Affichage des détails de l'étape ${step}`);
+            updateProgress(Math.min(10 + step * 25, 90));
+        }
+        
+        function showDetail(example) {
+            // In a real implementation, this would show detailed analysis
+            alert(`Affichage de l'analyse détaillée pour: ${example}`);
+        }
+        
+        function updateProgress(percentage) {
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.querySelector('#progress-bar + p').textContent = `${percentage}% complété`;
+        }
+        
+        // Simulator functions
+        function initializeSimulator() {
+            // Simplified initialization
+            console.log("Simulateur initialisé");
+        }
+        
+        function updateMassA(value) {
+            document.getElementById('mass-a-value').textContent = `${value} kg`;
+        }
+        
+        function updateMassB(value) {
+            document.getElementById('mass-b-value').textContent = `${value} kg`;
+        }
+        
+        function updateVelocityA(value) {
+            document.getElementById('velocity-a-value').textContent = `${value} m/s`;
+        }
+        
+        function updateVelocityB(value) {
+            document.getElementById('velocity-b-value').textContent = `${value} m/s`;
+        }
+        
+        function runSimulation() {
+            if (simulationRunning) return;
+            simulationRunning = true;
+            
+            currentCollisionType = document.getElementById('collision-type').value;
+            const massA = parseInt(document.getElementById('mass-a').value);
+            const massB = parseInt(document.getElementById('mass-b').value);
+            const velocityA = parseInt(document.getElementById('velocity-a').value);
+            const velocityB = parseInt(document.getElementById('velocity-b').value);
+            
+            // Calculate results based on physics formulas
+            let result = calculateCollision(massA, massB, velocityA, velocityB, currentCollisionType);
+            
+            // Display results
+            displayResults(result);
+            updateProgress(100);
+            
+            // Animate the simulation (simplified for this example)
+            animateSimulation(result);
+        }
+        
+        function calculateCollision(massA, massB, velocityA, velocityB, type) {
+            // Physics calculations for different collision types
+            const totalMass = massA + massB;
+            const momentumBefore = massA * velocityA + massB * velocityB;
+            const energyBefore = 0.5 * massA * velocityA ** 2 + 0.5 * massB * velocityB ** 2;
+            
+            let velocityAFinal, velocityBFinal, energyAfter, momentumTransfer;
+            
+            if (type === 'elastic') {
+                // Elastic collision formulas
+                velocityAFinal = ((massA - massB) * velocityA + 2 * massB * velocityB) / totalMass;
+                velocityBFinal = ((massB - massA) * velocityB + 2 * massA * velocityA) / totalMass;
+                energyAfter = 0.5 * massA * velocityAFinal ** 2 + 0.5 * massB * velocityBFinal ** 2;
+                momentumTransfer = massA * (velocityAFinal - velocityA);
+            } 
+            else if (type === 'inelastic') {
+                // Partially inelastic collision (coefficient of restitution = 0.5)
+                const e = 0.5;
+                velocityAFinal = (massA * velocityA + massB * velocityB + massB * e * (velocityB - velocityA)) / totalMass;
+                velocityBFinal = (massA * velocityA + massB * velocityB + massA * e * (velocityA - velocityB)) / totalMass;
+                energyAfter = 0.5 * massA * velocityAFinal ** 2 + 0.5 * massB * velocityBFinal ** 2;
+                momentumTransfer = massA * (velocityAFinal - velocityA);
+            } 
+            else {
+                // Perfectly inelastic collision
+                velocityAFinal = momentumBefore / totalMass;
+                velocityBFinal = velocityAFinal;
+                energyAfter = 0.5 * totalMass * velocityAFinal ** 2;
+                momentumTransfer = massA * (velocityAFinal - velocityA);
+            }
+            
+            return {
+                massA,
+                massB,
+                velocityA,
+                velocityB,
+                velocityAFinal,
+                velocityBFinal,
+                momentumBefore,
+                momentumAfter: massA * velocityAFinal + massB * velocityBFinal,
+                energyBefore,
+                energyAfter,
+                momentumTransfer: Math.abs(momentumTransfer),
+                type
+            };
+        }
+        
+        function displayResults(result) {
+            document.getElementById('momentum-before').textContent = `Avant : ${result.momentumBefore} kg·m/s`;
+            document.getElementById('momentum-after').textContent = `Après : ${result.momentumAfter} kg·m/s`;
+            
+            document.getElementById('energy-before').textContent = `Avant : ${result.energyBefore.toFixed(2)} J`;
+            document.getElementById('energy-after').textContent = `Après : ${result.energyAfter.toFixed(2)} J`;
+            
+            document.getElementById('velocity-a-final').textContent = `A : ${result.velocityAFinal.toFixed(2)} m/s`;
+            document.getElementById('velocity-b-final').textContent = `B : ${result.velocityBFinal.toFixed(2)} m/s`;
+            
+            document.getElementById('momentum-transfer').textContent = `Δp : ${result.momentumTransfer.toFixed(2)} kg·m/s`;
+            
+            let explanation = "";
+            if (result.type === 'elastic') {
+                explanation = "Dans un choc élastique, la quantité de mouvement totale et l'énergie cinétique totale sont conservées. Les vitesses finales sont calculées à partir des équations de conservation.";
+            } else if (result.type === 'inelastic') {
+                explanation = "Dans un choc inélastique, seule la quantité de mouvement est conservée. Une partie de l'énergie cinétique est convertie en d'autres formes d'énergie (chaleur, déformation).";
+            } else {
+                explanation = "Dans un choc parfaitement inélastique, les objets restent collés après la collision. La quantité de mouvement est conservée mais l'énergie cinétique ne l'est pas.";
+            }
+            
+            document.getElementById('explanation').textContent = explanation;
+        }
+        
+        function animateSimulation(result) {
+            // In a full implementation, this would animate the balls colliding
+            // For this example, we'll just update the simulation visual
+            const visual = document.getElementById('simulation-visual');
+            const altText = `Animation d'une collision ${result.type === 'elastic' ? 'élastique' : result.type === 'inelastic' ? 'inélastique' : 'parfaitement inélastique'} entre deux sphères de masses ${result.massA}kg et ${result.massB}kg avec vitesses initiales ${result.velocityA}m/s et ${result.velocityB}m/s`;
+            visual.alt = altText;
+            visual.src = `https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e722bbdf-82e3-4b71-8042-82eaf0845772.png
+            
+            setTimeout(() => {
+                simulationRunning = false;
+                visual.src = `https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4146c763-3ed1-4362-8d0c-03d086ca5106.png
+            }, 2000);
+        }
+        
+        function resetSimulation() {
+            document.getElementById('mass-a').value = 2;
+            document.getElementById('mass-b').value = 4;
+            document.getElementById('velocity-a').value = 5;
+            document.getElementById('velocity-b').value = -2;
+            document.getElementById('collision-type').value = 'elastic';
+            
+            updateMassA(2);
+            updateMassB(4);
+            updateVelocityA(5);
+            updateVelocityB(-2);
+            
+            document.getElementById('simulation-visual').src = "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/626daee8-f38b-44e1-a69b-9b6fdbe45cce.png";
+        }
+        
+        // Quiz functions
+        function checkAnswer(element, isCorrect) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('bg-blue-600', 'bg-red-600', 'text-white');
+                opt.classList.add('bg-gray-700');
+            });
+            
+            if (isCorrect) {
+                element.classList.remove('bg-gray-700');
+                element.classList.add('bg-blue-600', 'text-white');
+            } else {
+                element.classList.remove('bg-gray-700');
+                element.classList.add('bg-red-600', 'text-white');
+            }
+        }
+        
+        function restartLearning() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateProgress(10);
+        }
+    </script>
+</body>
+</html>
+

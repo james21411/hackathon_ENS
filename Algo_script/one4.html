@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Fonctions Trigonométriques - Un Voyage Circulaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes rotateCircle {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .circle-animation {
+            animation: rotateCircle 8s linear infinite;
+        }
+        
+        .card-hover {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-ring__circle {
+            stroke-dasharray: 220, 220;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-indigo-100 min-h-screen">
+    <!-- En-tête avec navigation -->
+    <header class="bg-indigo-900 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/af396f9b-9284-4082-a4ef-f1f2a7bc496f.png" alt="Logo du Lycée - Un livre ouvert avec un triangle et une onde sinusoïdale" class="h-12 w-12" />
+                    <h1 class="text-2xl font-bold">Mathématiques - Trigonométrie</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#concepts" class="hover:text-indigo-200 transition">Concepts</a></li>
+                        <li><a href="#animations" class="hover:text-indigo-200 transition">Animations</a></li>
+                        <li><a href="#exercices" class="hover:text-indigo-200 transition">Exercices</a></li>
+                        <li><a href="#applications" class="hover:text-indigo-200 transition">Applications</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px–6 py-8">
+        <!-- Section d'introduction -->
+        <section class="mb-16">
+            <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                <h1 class="text-4xl font-extrabold text-indigo-900 mb-6">Les Fonctions Trigonométriques</h1>
+                <p class="text-xl text-gray-700 mb-8">Découvrez comment sinus, cosinus et tangente décrivent les relations entre les angles et les côtés d'un triangle rectangle, et bien plus encore...</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div class="relative">
+                        <svg width="300" height="300" class="circle-animation">
+                            <circle cx="150" cy="150" r="100" stroke="#6366f1" stroke-width="2" fill="none" />
+                            <line x1="150" y1="150" x2="250" y2="150" stroke="#10b981" stroke-width="2" />
+                            <path d="M 150 150 L 250 150 L 250 250 Z" fill="#a5b4fc" fill-opacity="0.3" stroke="#4f46e5" stroke-width="2" />
+                            <text x="200" y="130" text-anchor="middle" fill="#4f46e5" font-weight="bold">cos(θ)</text>
+                            <text x="265" y="200" text-anchor="middle" fill="#10b981" font-weight="bold">sin(θ)</text>
+                            <text x="175" y="220" text-anchor="middle" fill="#7c3aed" font-weight="bold">tan(θ)</text>
+                        </svg>
+                    </div>
+                </div>
+                
+                <button id="startLearning" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg">
+                    Commencer l'Apprentissage
+                </button>
+            </div>
+        </section>
+
+        <!-- Objectifs pédagogiques -->
+        <section class="mb-16 bg-indigo-50 rounded-2xl p-8">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-6">Objectifs pédagogiques</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-indigo-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 7l-7-7 7-7" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Définitions</h3>
+                    <p class="text-gray-600">Comprendre les définitions des fonctions sinus, cosinus et tangente dans un triangle rectangle.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-green-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Visualisation</h3>
+                    <p class="text-gray-600">Observer graphiquement le comportement des fonctions trigonométriques sur le cercle unité.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-purple-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Applications</h3>
+                    <p class="text-gray-600">Résoudre des problèmes concrets utilisant les relations trigonométriques.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-amber-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Calculs</h3>
+                    <p class="text-gray-600">Maîtriser le calcul des valeurs trigonométriques pour des angles remarquables.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Concepts fondamentaux -->
+        <section id="concepts" class="mb-16">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-8">Concepts Fondamentaux</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Définitions -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-indigo-700 p-6 text-white">
+                        <h3 class="text-2xl font-bold">Définitions dans le Triangle Rectangle</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-center mb-6">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f33a6651-fc96-4d37-9d70-b59b56a47c9e.png" alt="Triangle rectangle ABC avec angle droit en B, hypoténuse AC, côtés AB et BC marqués comme adjacent et opposé selon l'angle A" />
+                        </div>
+                        <div class="space-y-4 text-gray-700">
+                            <div class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-800 rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">1</span>
+                                <div>
+                                    <p class="font-bold">Sinus d'un angle = Opposé / Hypoténuse</p>
+                                    <p class="text-sm">sin(θ) = BC / AC</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-800 rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">2</span>
+                                <div>
+                                    <p class="font-bold">Cosinus d'un angle = Adjacent / Hypoténuse</p>
+                                    <p class="text-sm">cos(θ) = AB / AC</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-800 rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">3</span>
+                                <div>
+                                    <p class="font-bold">Tangente d'un angle = Opposé / Adjacent</p>
+                                    <p class="text-sm">tan(θ) = BC / AB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cercle trigonométrique -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-purple-700 p-6 text-white">
+                        <h3 class="text-2xl font-bold">Le Cercle Trigonométrique</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-center mb-6">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f7ea0a19-87e8-4e68-bd77-33ed16aba77d.png" alt="Cercle trigonométrique de rayon 1 avec angle θ, point M sur le cercle, projection sur les axes formant les coordonnées (cos(θ), sin(θ))" />
+                        </div>
+                        <div class="space-y-4 text-gray-700">
+                            <p>Le cercle trigonométrique est un cercle de rayon 1 centré à l'origine d'un repère orthonormé.</p>
+                            <p>Tout point M du cercle correspond à un angle θ et a pour coordonnées (cos(θ), sin(θ)).</p>
+                            <p>La tangente est représentée par la longueur de la droite tangente entre le point (1,0) et son intersection avec la droite (OM).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Animations interactives -->
+        <section id="animations" class="mb-16">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-8">Exploration Interactive</h2>
+            
+            <!-- Animation cercle trigo -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-10">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-800 p-6 text-white">
+                    <h3 class="text-2xl font-bold">Animation du Cercle Trigonométrique</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <canvas id="circleCanvas" width="400" height="400"></canvas>
+                            <div class="mt-4 flex justify-between items-center">
+                                <label for="angleSlider" class="font-medium text-gray-700">Angle θ</label>
+                                <input type="range" id="angleSlider" min="0" max="360" value="30" class="w-3/4">
+                                <span id="angleValue" class="ml-2 font-bold text-indigo-700">30°</span>
+                            </div>
+                            <button id="animateCircle" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full transition">
+                                Animation complète
+                            </button>
+                        </div>
+                        <div>
+                            <div class="bg-gray:
+<create_file>
+<path>trigonometrie_interactive.html</path>
+<content>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Fonctions Trigonométriques - Un Voyage Circulaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes rotateCircle {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .circle-animation {
+            animation: rotateCircle 8s linear infinite;
+        }
+        
+        .card-hover {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-ring__circle {
+            stroke-dasharray: 220, 220;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-blue-50 to-indigo-100 min-h-screen">
+    <!-- En-tête avec navigation -->
+    <header class="bg-indigo-900 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c18e8c63-8690-456e-b7db-3058480b5f7a.png" alt="Logo du Lycée - Un livre ouvert avec un triangle et une onde sinusoïdale" class="h-12 w-12" />
+                    <h1 class="text-2xl font-bold">Mathématiques - Trigonométrie</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#concepts" class="hover:text-indigo-200 transition">Concepts</a></li>
+                        <li><a href="#animations" class="hover:text-indigo-200 transition">Animations</a></li>
+                        <li><a href="#exercices" class="hover:text-indigo-200 transition">Exercices</a></li>
+                        <li><a href="#applications" class="hover:text-indigo-200 transition">Applications</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <!-- Section d'introduction -->
+        <section class="mb-16">
+            <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                <h1 class="text-4xl font-extrabold text-indigo-900 mb-6">Les Fonctions Trigonométriques</h1>
+                <p class="text-xl text-gray-700 mb-8">Découvrez comment sinus, cosinus et tangente décrivent les relations entre les angles et les côtés d'un triangle rectangle, et bien plus encore...</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div class="relative">
+                        <svg width="300" height="300" class="circle-animation">
+                            <circle cx="150" cy="150" r="100" stroke="#6366f1" stroke-width="2" fill="none" />
+                            <line x1="150" y1="150" x2="250" y2="150" stroke="#10b981" stroke-width="2" />
+                            <path d="M 150 150 L 250 150 L 250 250 Z" fill="#a5b4fc" fill-opacity="0.3" stroke="#4f46e5" stroke-width="2" />
+                            <text x="200" y="130" text-anchor="middle" fill="#4f46e5" font-weight="bold">cos(θ)</text>
+                            <text x="265" y="200" text-anchor="middle" fill="#10b981" font-weight="bold">sin(θ)</text>
+                            <text x="175" y="220" text-anchor="middle" fill="#7c3aed" font-weight="bold">tan(θ)</text>
+                        </svg>
+                    </div>
+                </div>
+                
+                <button id="startLearning" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg">
+                    Commencer l'Apprentissage
+                </button>
+            </div>
+        </section>
+
+        <!-- Objectifs pédagogiques -->
+        <section class="mb-16 bg-indigo-50 rounded-2xl p-8">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-6">Objectifs pédagogiques</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-indigo-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 7l-7-7 7-7" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Définitions</h3>
+                    <p class="text-gray-600">Comprendre les définitions des fonctions sinus, cosinus et tangente dans un triangle rectangle.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-green-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Visualisation</h3>
+                    <p class="text-gray-600">Observer graphiquement le comportement des fonctions trigonométriques sur le cercle unité.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-purple-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Applications</h3>
+                    <p class="text-gray-600">Résoudre des problèmes concrets utilisant les relations trigonométriques.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover">
+                    <div class="text-amber-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Calculs</h3>
+                    <p class="text-gray-600">Maîtriser le calcul des valeurs trigonométriques pour des angles remarquables.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Concepts fondamentaux -->
+        <section id="concepts" class="mb-16">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-8">Concepts Fondamentaux</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Définitions -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-indigo-700 p-6 text-white">
+                        <h3 class="text-2xl font-bold">Définitions dans le Triangle Rectangle</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-center mb-6">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ecd7571b-cb49-4669-a47c-f29f2a518d1e.png" alt="Triangle rectangle ABC avec angle droit en B, hypoténuse AC, côtés AB et BC marqués comme adjacent et opposé selon l'angle A" />
+                        </div>
+                        <div class="space-y-4 text-gray-700">
+                            <div class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-800 rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">1</span>
+                                <div>
+                                    <p class="font-bold">Sinus d'un angle = Opposé / Hypoténuse</p>
+                                    <p class="text-sm">sin(θ) = BC / AC</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-800 rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">2</span>
+                                <div>
+                                    <p class="font-bold">Cosinus d'un angle = Adjacent / Hypoténuse</p>
+                                    <p class="text-sm">cos(θ) = AB / AC</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-800 rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">3</span>
+                                <div>
+                                    <p class="font-bold">Tangente d'un angle = Opposé / Adjacent</p>
+                                    <p class="text-sm">tan(θ) = BC / AB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cercle trigonométrique -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-purple-700 p-6 text-white">
+                        <h3 class="text-2xl font-bold">Le Cercle Trigonométrique</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-center mb-6">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5d5e59d1-089c-475f-90a2-34a799efe46d.png" alt="Cercle trigonométrique de rayon 1 avec angle θ, point M sur le cercle, projection sur les axes formant les coordonnées (cos(θ), sin(θ))" />
+                        </div>
+                        <div class="space-y-4 text-gray-700">
+                            <p>Le cercle trigonométrique est un cercle de rayon 1 centré à l'origine d'un repère orthonormé.</p>
+                            <p>Tout point M du cercle correspond à un angle θ et a pour coordonnées (cos(θ), sin(θ)).</p>
+                            <p>La tangente est représentée par la longueur de la droite tangente entre le point (1,0) et son intersection avec la droite (OM).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Animations interactives -->
+        <section id="animations" class="mb-16">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-8">Exploration Interactive</h2>
+            
+            <!-- Animation cercle trigo -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-10">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-800 p-6 text-white">
+                    <h3 class="text-2xl font-bold">Animation du Cercle Trigonométrique</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <canvas id="circleCanvas" width="400" height="400"></canvas>
+                            <div class="mt-4 flex justify-between items-center">
+                                <label for="angleSlider" class="font-medium text-gray-700">Angle θ</label>
+                                <input type="range" id="angleSlider" min="0" max="360" value="30" class="w-3/4">
+                                <span id="angleValue" class="ml-2 font-bold text-indigo-700">30°</span>
+                            </div>
+                            <button id="animateCircle" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full transition">
+                                Animation complète
+                            </button>
+                        </div>
+                        <div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2">Valeurs calculées</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <span class="text-sm text-gray-500">sin(θ)</span>
+                                        <div id="sinValue" class="font-bold text-blue-600 text-xl">0.50</div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-500">cos(θ)</span>
+                                        <div id="cosValue" class="font-bold text-green-600 text-xl">0.87</div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-500">tan(θ)</span>
+                                        <div id="tanValue" class="font-bold text-purple-600 text-xl">0.58</div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-500">Radians</span>
+                                        <div id="radValue" class="font-bold text-amber-600 text-xl">0.52</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <h4 class="font-bold text-lg mb-2">Relations fondamentales</h4>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li>• sin²θ + cos²θ = 1</li>
+                                    <li>• tanθ = sinθ / cosθ</li>
+                                    <li>• sin(90°-θ) = cosθ</li>
+                                    <li>• cos(90°-θ) = sinθ</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Graphes des fonctions -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-green-600 to-teal-800 p-6 text-white">
+                    <h3 class="text-2xl font-bold">Graphiques des Fonctions Trigonométriques</h3>
+                </div>
+                <div class="p-6">
+                    <div class="mb-8">
+                        <canvas id="sinGraph" height="200"></canvas>
+                        <div class="mt-2 text-center font-medium text-gray-700">Fonction Sinus</div>
+                    </div>
+                    <div class="mb-8">
+                        <canvas id="cosGraph" height="200"></canvas>
+                        <div class="mt-2 text-center font-medium text-gray-700">Fonction Cosinus</div>
+                    </div>
+                    <div>
+                        <canvas id="tanGraph" height="200"></canvas>
+                        <div class="mt-2 text-center font-medium text-gray-700">Fonction Tangente</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Exercices interactifs -->
+        <section id="exercices" class="mb-16">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-8">Exercices Pratiques</h2>
+            
+            <!-- QCM -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-10">
+                <div class="bg-gradient-to-r from-orange-600 to-amber-800 p-6 text-white">
+                    <h3 class="text-2xl font-bold">Questionnaire à Choix Multiples</h3>
+                </div>
+                <div class="p-6">
+                    <div id="question1" class="mb-8">
+                        <p class="font-bold text-lg mb-4">1. Dans un triangle rectangle, que vaut cos(θ) ?</p>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                Opposé / Hypoténuse
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                Opposé / Adjacent
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="true">
+                                Adjacent / Hypoténuse
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                Hypoténuse / Adjacent
+                            </button>
+                        </div>
+                        <div id="feedback1" class="mt-3 p-3 rounded-lg hidden bg-green-100 text-green-800">
+                            Bravo ! La bonne réponse est bien "Adjacent / Hypoténuse".
+                        </div>
+                    </div>
+                    
+                    <div id="question2" class="mb-8">
+                        <p class="font-bold text-lg mb-4">2. Quelle est la valeur de sin(30°) ?</p>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                √3/2
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="true">
+                                1/2
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                √2/2
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                1
+                            </button>
+                        </div>
+                        <div id="feedback2" class="mt-3 p-3 rounded-lg hidden bg-green-100 text-green-800">
+                            Exact ! sin(30°) = 1/2. C'est l'une des valeurs remarquables à connaître.
+                        </div>
+                    </div>
+                    
+                    <div id="question3">
+                        <p class="font-bold text-lg mb-4">3. Quelle relation est toujours vraie pour tout angle θ ?</p>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="true">
+                                sin²θ + cos²θ = 1
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                sinθ + cosθ = 1
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                sinθ × cosθ = 1
+                            </button>
+                            <button class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-indigo-50 transition answer-btn" data-correct="false">
+                                sinθ / cosθ = 1
+                            </button>
+                        </div>
+                        <div id="feedback3" class="mt-3 p-3 rounded-lg hidden bg-green-100 text-green-800">
+                            Correct ! C'est l'identité trigonométrique fondamentale : sin²θ + cos²θ = 1
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exercice avec calcul -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-rose-600 to-pink-800 p-6 text-white">
+                    <h3 class="text-2xl font-bold">Résolution de Problème</h3>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-col lg:flex-row gap-8">
+                        <div class="lg:w-1/2">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/30a96efc-597f-47a9-b8b6-2af4ac2568e3.png" alt="Problème d'application : un bâtiment et son ombre avec un angle d'élévation marqué, nécessitant le calcul de la hauteur du bâtiment en utilisant la trigonométrie" class="mb-4 rounded-lg" />
+                            <p class="text-gray-700 mb-4">Un observateur se trouve à 20 mètres d'un bâtiment. L'angle d'élévation jusqu'au sommet du bâtiment est de 45°. Quelle est la hauteur du bâtiment ?</p>
+                            <div class="mt-4">
+                                <label for="solution" class="block text-sm font-medium text-gray-700">Votre réponse (en mètres)</label>
+                                <input type="number" id="solution" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                                <button id="checkSolution" class="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full transition">
+                                    Vérifier
+                                </button>
+                            </div>
+                            <div id="solutionFeedback" class="mt-3 p-3 rounded-lg hidden"></div>
+                        </div>
+                        <div class="lg:w-1/2 bg-indigo-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-lg mb-3">Indices</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <span class="bg-indigo-600 text-white rounded-full h-6 w-6 flex items-center justify-center mr-3 mt-1">1</span>
+                                    <div>
+                                        <p class="font-medium">Identifiez les éléments dans le triangle rectangle :</p>
+                                        <p class="text-sm text-gray-600">- Distance observateur/bâtiment = côté adjacent à l'angle<br>- Hauteur du bâtiment = côté opposé à l'angle</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="bg-indigo-600 text-white rounded-full h-6 w-6 flex items-center justify-center mr-3 mt-1">2</span>
+                                    <div>
+                                        <p class="font-medium">Sélectionnez la bonne formule trigonométrique :</p>
+                                        <p class="text-sm text-gray-600">Nous connaissons l'angle et le côté adjacent, nous cherchons le côté opposé. Quelle fonction relie ces éléments ?</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <span class="bg-indigo-600 text-white rounded-full h-6 w-6 flex items-center justify-center mr-3 mt-1">3</span>
+                                    <div>
+                                        <p class="font-medium">Effectuez le calcul :</p>
+                                        <p class="text-sm text-gray-600">tan(45°) = ? N'oubliez pas que tan(θ) = opposé / adjacent</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Applications réelles -->
+        <section id="applications" class="mb-16">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-8">Applications Réelles</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cabc3842-4333-4127-91cc-b3bfaef80dc4.png" alt="Architecte utilisant un théodolite pour mesurer des angles lors de la construction d'un bâtiment" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Architecture</h3>
+                        <p class="text-gray-600">Calcul des hauteurs de bâtiments, conception de structures complexes.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8bba8298-4c15-4e09-ae42-fb140e7f747e.png" alt="Navigateur maritime utilisant des instruments pour déterminer la position en mer en fonction des angles des étoiles" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Navigation</h3>
+                        <p class="text-gray-600">Détermination de positions en mer ou dans les airs.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fe17d1b2-864e-4583-b272-79f3f39b98e0.png" alt="Ondes sinusoïdales représentant les ondes sonores et lumineuses analysées par un scientifique" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Physique</h3>
+                        <p class="text-gray-600">Description des ondes (sonores, lumineuses, électromagnétiques).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Résumé visuel -->
+        <section class="mb-16">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-yellow-500 to-amber-600 p-6 text-white">
+                    <h2 class="text-2xl font-bold">Résumé Visuel</h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/2368b63b-54fd-4e96-8514-61dac0df329d.png" alt="Graphique synthétique montrant les valeurs remarquables du sinus, cosinus et tangente pour les angles 0°, 30°, 45°, 60° et 90°" class="mb-4 mx-auto" />
+                            <h3 class="font-bold text-lg mb-2">Valeurs Remarquables</h3>
+                            <p class="text-gray-600">Tableau des principales valeurs trigonométriques.</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/6d396043-a156-4e09-9911-c52a7c7ffbac.png" alt="Illustration des trois fonctions trigonométriques principales superposées sur un même graphique montrant leurs relations" class="mb-4 mx-auto" />
+                            <h3 class="font-bold text-lg mb-2">Relations entre Fonctions</h3>
+                            <p class="text-gray-600">Comment sinus, cosinus et tangente sont reliés.</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ea2a7b5b-902c-4419-b1e6-76d7ce1ebb7b.png" alt="Cycle complet montrant comment les valeurs des fonctions trigonométriques évoluent selon les quatre quadrants du cercle" class="mb-4 mx-auto" />
+                            <h3 class="font-bold text-lg mb-2">Signes par Quadrant</h3>
+                            <p class="text-gray-600">Quelle fonction est positive dans quel quadrant.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Retour sur l'apprentissage -->
+        <section class="bg-white rounded-2xl shadow-xl p-8">
+            <h2 class="text-3xl font-bold text-center text-indigo-900 mb-6">Évaluez votre Apprentissage</h2>
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-3">Quelle partie de cette leçon avez-vous trouvée la plus utile ?</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input id="most_useful1" name="most_useful" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                            <label for="most_useful1" class="ml-3 block text-sm font-medium text-gray-700">
+                                Les animations interactives du cercle trigonométrique
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="most_useful2" name="most_useful" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                            <label for="most_useful2" class="ml-3 block text-sm font-medium text-gray-700">
+                                Les graphiques des fonctions trigonométriques
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="most_useful3" name="most_useful" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                            <label for="most_useful3" class="ml-3 block text-sm font-medium text-gray-700">
+                                Les exercices pratiques avec corrections
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="most_useful4" name="most_useful" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                            <label for="most_useful4" class="ml-3 block text-sm font-medium text-gray-700">
+                                Les applications concrètes en physique et architecture
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-3">Avez-vous des suggestions pour améliorer cette leçon ?</h3>
+                    <textarea id="suggestions" name="suggestions" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"></textarea>
+                </div>
+                
+                <button id="submitFeedback" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-full transition">
+                    Soumettre mon Avis
+                </button>
+                
+                <div id="thankYouMessage" class="mt-4 p-4 bg-green-100 text-green-800 rounded-lg hidden">
+                    Merci pour votre feedback ! Nous l'utiliserons pour améliorer cette leçon.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-indigo-900 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/1278e77e-f249-4fac-8b77-af5488dcb01e.png" alt="Mini logo du Lycée - Une simple onde sinusoïdale stylisée" class="h-10 w-10" />
+                        <span class="text-xl font-bold">Mathématiques Avancées</span>
+                    </div>
+                    <p class="mt-2 text-indigo-200">Lycée scientifique international</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-indigo-300 transition">À propos</a>
+                    <a href="#" class="hover:text-indigo-300 transition">Contact</a>
+                    <a href="#" class="hover:text-indigo-300 transition">Ressources</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-indigo-800 text-center text-indigo-400 text-sm">
+                <p>© 2023 Lycée International. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialisation des graphiques
+        document.addEventListener('DOMContentLoaded', function() {
+            // Canvas du cercle trigonométrique
+            const circleCanvas = document.getElementById('circleCanvas');
+            const circleCtx = circleCanvas.getContext('2d');
+            
+            // Slider d'angle
+            const angleSlider = document.getElementById('angleSlider');
+            const angleValue = document.getElementById('angleValue');
+            const animateBtn = document.getElementById('animateCircle');
+            
+            // Valeurs affichées
+            const sinValue = document.getElementById('sinValue');
+            const cosValue = document.getElementById('cosValue');
+            const tanValue = document.getElementById('tanValue');
+            const radValue = document.getElementById('radValue');
+            
+            // Graphes des fonctions
+            const sinGraph = new Chart(
+                document.getElementById('sinGraph'),
+                getChartConfig('Sinus', 'rgb(99, 102, 241)')
+            );
+            
+            const cosGraph = new Chart(
+                document.getElementById('cosGraph'),
+                getChartConfig('Cosinus', 'rgb(16, 185, 129)')
+            );
+            
+            const tanGraph = new Chart(
+                document.getElementById('tanGraph'),
+                getChartConfig('Tangente', 'rgb(124, 58, 237)')
+            );
+            
+            // QCM
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            answerButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const isCorrect = this.getAttribute('data-correct') === 'true';
+                    const questionId = this.closest('div').id;
+                    const feedback = document.getElementById(`feedback${questionId.slice(-1)}`);
+                    
+                    if (isCorrect) {
+                        this.classList.add('bg-green-100', 'border-green-400');
+                        feedback.classList.remove('hidden');
+                    } else {
+                        this.classList.add('bg-red-100', 'border-red-400');
+                    }
+                    
+                    // Désactiver tous les boutons de cette question
+                    const allButtons = this.parentNode.querySelectorAll('.answer-btn');
+                    allButtons.forEach(b => {
+                        b.disabled = true;
+                        if (b.getAttribute('data-correct') === 'true') {
+                            b.classList.add('bg-green-100', 'border-green-400');
+                        }
+                    });
+                });
+            });
+            
+            // Exercice solution
+            const checkSolutionBtn = document.getElementById('checkSolution');
+            const solutionFeedback = document.getElementById('solutionFeedback');
+            
+            checkSolutionBtn.addEventListener('click', function() {
+                const userAnswer = parseFloat(document.getElementById('solution').value);
+                const correctAnswer = 20; // tan(45°) = 1 = hauteur / 20
+                
+                if (isNaN(userAnswer)) {
+                    solutionFeedback.textContent = "Veuillez entrer un nombre valide";
+                    solutionFeedback.className = "mt-3 p-3 rounded-lg bg-red-100 text-red-800";
+                    solutionFeedback.classList.remove('hidden');
+                } else if (Math.abs(userAnswer - correctAnswer) < 0.1) {
+                    solutionFeedback.textContent = "Correct ! La hauteur du bâtiment est bien de 20 mètres (tan(45°) = 1 = hauteur / 20 → hauteur = 20 m)";
+                    solutionFeedback.className = "mt-3 p-3 rounded-lg bg-green-100 text-green-800";
+                    solutionFeedback.classList.remove('hidden');
+                } else {
+                    solutionFeedback.textContent = `Pas tout à fait. La bonne réponse est ${correctAnswer}. Revoir l'utilisation de la tangente.`;
+                    solutionFeedback.className = "mt-3 p-3 rounded-lg bg-red-100 text-red-800";
+                    solutionFeedback.classList.remove('hidden');
+                }
+            });
+            
+            // Feedback
+            const submitFeedbackBtn = document.getElementById('submitFeedback');
+            const thankYouMessage = document.getElementById('thankYouMessage');
+            
+            submitFeedbackBtn.addEventListener('click', function() {
+                thankYouMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    thankYouMessage.classList.add('hidden');
+                }, 5000);
+            });
+            
+            // Configuration du slider et animation
+            let animationId = null;
+            let currentAngle = 30;
+            
+            angleSlider.addEventListener('input', function() {
+                currentAngle = parseInt(this.value);
+                angleValue.textContent = `${currentAngle}°`;
+                updateCircle(currentAngle);
+                updateFunctionGraphs(currentAngle);
+            });
+            
+            animateBtn.addEventListener('click', function() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                    animateBtn.textContent = "Animation complète";
+                    return;
+                }
+                
+                animateBtn.textContent = "Arrêter";
+                let startTime = null;
+                const duration = 8000; // 8 secondes
+                
+                function animate(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const progress = (timestamp - startTime) / duration;
+                    
+                    if (progress < 1) {
+                        const angle = progress * 360;
+                        currentAngle = angle;
+                        angleSlider.value = angle;
+                        angleValue.textContent = `${Math.round(angle)}°`;
+                        updateCircle(angle);
+                        updateFunctionGraphs(angle);
+                        animationId = requestAnimationFrame(animate);
+                    } else {
+                        animateBtn.textContent = "Animation complète";
+                        animationId = null;
+                    }
+                }
+                
+                animationId = requestAnimationFrame(animate);
+            });
+            
+            // Initial render
+            updateCircle(currentAngle);
+            updateFunctionGraphs(currentAngle);
+            
+            // Fonctions utilitaires
+            function updateCircle(angleDeg) {
+                const angleRad = angleDeg * Math.PI / 180;
+                const radius = 150;
+                const centerX = radius;
+                const centerY = radius;
+                
+                // Effacer le canvas
+                circleCtx.clearRect(0, 0, circleCanvas.width, circleCanvas.height);
+                
+                // Dessiner le cercle
+                circleCtx.beginPath();
+                circleCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                circleCtx.strokeStyle = '#4f46e5';
+                circleCtx.lineWidth = 2;
+                circleCtx.stroke();
+                
+                // Dessiner les axes
+                circleCtx.beginPath();
+                circleCtx.moveTo(0, centerY);
+                circleCtx.lineTo(2 * radius, centerY);
+                circleCtx.strokeStyle = '#6b7280';
+                circleCtx.stroke();
+                
+                circleCtx.beginPath();
+                circleCtx.moveTo(centerX, 0);
+                circleCtx.lineTo(centerX, 2 * radius);
+                circleCtx.strokeStyle = '#6b7280';
+                circleCtx.stroke();
+                
+                // Dessiner le rayon
+                circleCtx.beginPath();
+                circleCtx.moveTo(centerX, centerY);
+                circleCtx.lineTo(
+                    centerX + radius * Math.cos(angleRad),
+                    centerY - radius * Math.sin(angleRad)
+                );
+                circleCtx.strokeStyle = '#ef4444';
+                circleCtx.lineWidth = 2;
+                circleCtx.stroke();
+                
+                // Dessiner les projections
+                // Cosinus (x)
+                circleCtx.beginPath();
+                circleCtx.moveTo(centerX, centerY);
+                circleCtx.lineTo(
+                    centerX + radius * Math.cos(angleRad),
+                    centerY
+                );
+                circleCtx.strokeStyle = '#10b981';
+                circleCtx.lineWidth = 2;
+                circleCtx.stroke();
+                
+                // Sinus (y)
+                circleCtx.beginPath();
+                circleCtx.moveTo(
+                    centerX + radius * Math.cos(angleRad),
+                    centerY
+                );
+                circleCtx.lineTo(
+                    centerX + radius * Math.cos(angleRad),
+                    centerY - radius * Math.sin(angleRad)
+                );
+                circleCtx.strokeStyle = '#3b82f6';
+                circleCtx.lineWidth = 2;
+                circleCtx.stroke();
+                
+                // Point sur le cercle
+                circleCtx.beginPath();
+                circleCtx.arc(
+                    centerX + radius * Math.cos(angleRad),
+                    centerY - radius * Math.sin(angleRad),
+                    5, 0, 2 * Math.PI
+                );
+                circleCtx.fillStyle = '#ef4444';
+                circleCtx.fill();
+                
+                // Mise à jour des valeurs
+                const sin = Math.sin(angleRad).toFixed(2);
+                const cos = Math.cos(angleRad).toFixed(2);
+                const tan = Math.tan(angleRad).toFixed(2);
+                
+                sinValue.textContent = sin;
+                cosValue.textContent = cos;
+                tanValue.textContent = tan;
+                radValue.textContent = angleRad.toFixed(2);
+            }
+            
+            function updateFunctionGraphs(angleDeg) {
+                const angleRad = angleDeg * Math.PI / 180;
+                
+                // Sinus
+                sinGraph.data.datasets[0].pointBackgroundColor = Array(100).fill('rgba(99, 102, 241, 0.1)');
+                const sinIndex = Math.floor((angleDeg / 360) * 100);
+                sinGraph.data.datasets[0].pointBackgroundColor[sinIndex] = 'rgb(99, 102, 241)';
+                sinGraph.update();
+                
+                // Cosinus
+                cosGraph.data.datasets[0].pointBackgroundColor = Array(100).fill('rgba(16, 185, 129, 0.1)');
+                cosGraph.data.datasets[0].pointBackgroundColor[sinIndex] = 'rgb(16, 185, 129)';
+                cosGraph.update();
+                
+                // Tangente
+                tanGraph.data.datasets[0].pointBackgroundColor = Array(100).fill('rgba(124, 58, 237, 0.1)');
+                tanGraph.data.datasets[0].pointBackgroundColor[sinIndex] = 'rgb(124, 58, 237)';
+                tanGraph.update();
+            }
+            
+            function getChartConfig(label, color) {
+                return {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 100}, (_, i) => (i * 3.6).toFixed(0)),
+                        datasets: [{
+                            label: label,
+                            data: Array.from({length: 100}, (_, i) => {
+                                const angle = i * 3.6 * Math.PI / 180;
+                                if (label === 'Sinus') return Math.sin(angle);
+                                if (label === 'Cosinus') return Math.cos(angle);
+                                if (label === 'Tangente') {
+                                    // Eviter les valeurs infinies pour la tangente
+                                    const tanVal = Math.tan(angle);
+                                    return Math.abs(tanVal) > 4 ? (tanVal > 0 ? 4 : -4) : tanVal;
+                                }
+                            }),
+                            borderColor: color,
+                            backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: Array(100).fill(color.replace(')', ', 0.1)').replace('rgb', 'rgba')),
+                            pointBorderColor: color,
+                                                        tension: 0.4,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Angle (degrés)'
+                                }
+                            },
+                            y: {
+                                min: -1.5,
+                                max: 1.5,
+                                title: {
+                                    display: true,
+                                    text: 'Valeur'
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                radius: 3,
+                                hoverRadius: 5
+                            }
+                        }
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html>
+

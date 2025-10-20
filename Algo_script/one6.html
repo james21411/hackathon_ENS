@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratoire d'Électromagnétisme | Simulations Quantiques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas { display: block; }
+        #simulation-container { 
+            height: 65vh;
+            position: relative;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        }
+        .control-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            background: linear-gradient(90deg, #4F46E5 0%, #EC4899 100%);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                Laboratoire d'Électromagnétisme Quantique
+            </h1>
+            <p class="mt-4 text-lg text-gray-300 max-w-3xl mx-auto">
+                Exploration interactive des champs électromagnétiques à l'échelle atomique avec visualisation 3D et analyse de données en temps réel.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-3">
+                <div id="simulation-container">
+                    <!-- La scène 3D sera injectée ici -->
+                </div>
+            </div>
+
+            <div class="control-panel rounded-xl p-6 space-y-6">
+                <div class="space-y-3">
+                    <h3 class="text-xl font-semibold text-purple-300">Configuration du Champ</h3>
+                    <div>
+                        <label class="block mb-1 text-sm">Intensité du Champ (V/m)</label>
+                        <input type="range" id="field-strength" min="0" max="1000" value="500" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>0</span>
+                            <span>1000</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm">Fréquence (Hz)</label>
+                        <input type="range" id="frequency" min="1" max="100" value="30" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>1 Hz</span>
+                            <span>100 Hz</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm">Orientation (°)</label>
+                        <input type="range" id="orientation" min="0" max="360" value="45" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>0°</span>
+                            <span>360°</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-4 border-t border-gray-700">
+                    <h3 class="text-xl font-semibold text-blue-300">Simulations</h3>
+                    <button id="predefined-1" class="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white py-2 px-4 rounded-md hover:opacity-90 transition">
+                        Effet Photoélectrique
+                    </button>
+                    <button id="predefined-2" class="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-2 px-4 rounded-md hover:opacity-90 transition">
+                        Interférences Ondes EM
+                    </button>
+                    <button id="predefined-3" class="w-full bg-gradient-to-r from-pink-500 to-pink-700 text-white py-2 px-4 rounded-md hover:opacity-90 transition">
+                        Résonance Magnétique
+                    </button>
+                </div>
+
+                <div class="pt-4 border-t border-gray-700">
+                    <h3 class="text-xl font-semibold text-green-300 mb-3">Équations du Champ</h3>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <div class="equation text-sm mb-3">Loi de Faraday: ∇×E = -∂B/∂t</div>
+                        <div class="equation text-sm mb-3">Loi d'Ampère-Maxwell: ∇×B = μ₀J + μ₀ε₀∂E/∂t</div>
+                        <div class="equation text-sm mb-3">Champ EM: E(x,t) = E₀cos(k·x-ωt+φ)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-gray-800 rounded-xl p-6">
+                <h3 class="text-xl font-semibold text-blue-300 mb-4">Analyse Spectrum</h3>
+                <canvas id="spectrum-chart" height="200"></canvas>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-6">
+                <h3 class="text-xl font-semibold text-purple-300 mb-4">Détails du Champ</h3>
+                <div class="space-y-2" id="field-details">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Intensité:</span>
+                        <span id="field-value" class="font-mono">500 V/m</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Fréquence:</span>
+                        <span id="freq-value" class="font-mono">30 Hz</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Longueur d'onde:</span>
+                        <span id="wavelength-value" class="font-mono">10,000 km</span>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <div class="h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md overflow-hidden">
+                        <div id="intensity-bar" class="h-full bg-gradient-to-r from-pink-500 to-yellow-500" style="width: 50%"></div>
+                    </div>
+                    <div class="text-center text-xs mt-1">Densité d'énergie EM</div>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-6">
+                <h3 class="text-xl font-semibold text-pink-300 mb-4">Historique</h3>
+                <div id="history-graph" class="h-48">
+                    <canvas id="energy-chart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-gray-800 rounded-xl overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-white mb-6">Modules Pédagogiques</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="module-card bg-gradient-to-br from-purple-900 to-blue-900 rounded-lg p-5 hover:scale-[1.02] transition-transform">
+                        <h3 class="font-semibold text-lg mb-2">Loi de Faraday</h3>
+                        <p class="text-sm text-gray-300">Visualisation des courants induits par variation de flux magnétique</p>
+                    </div>
+                    <div class="module-card bg-gradient-to-br from-blue-900 to-green-900 rounded-lg p-5 hover:scale-[1.02] transition-transform">
+                        <h3 class="font-semibold text-lg mb-2">Ondes EM</h3>
+                        <p class="text-sm text-gray-300">Propagation et interférence des ondes électromagnétiques</p>
+                    </div>
+                    <div class="module-card bg-gradient-to-br from-green-900 to-yellow-900 rounded-lg p-5 hover:scale-[1.02] transition-transform">
+                        <h3 class="font-semibold text-lg mb-2">Quantum EM</h3>
+                        <p class="text-sm text-gray-300">Phénomènes quantiques dans l'interaction lumière-matière</p>
+                    </div>
+                    <div class="module-card bg-gradient-to-br from-yellow-900 to-pink-900 rounded-lg p-5 hover:scale-[1.02] transition-transform">
+                        <h3 class="font-semibold text-lg mb-2">Applications</h3>
+                        <p class="text-sm text-gray-300">Technologies modernes basées sur l'électromagnétisme</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialisation de la scène Three.js
+        const container = document.getElementById('simulation-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        
+        // Configuration de base
+        camera.position.z = 30;
+        scene.background = new THREE.Color(0x0f2027);
+        
+        // Ajout d'une lumière
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(0, 0, 1);
+        scene.add(light);
+        
+        // Création d'un système de particules
+        const particleGeometry = new THREE.BufferGeometry();
+        const particleCount = 1000;
+        
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 50;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+            
+            colors[i * 3] = Math.random();
+            colors[i * 3 + 1] = Math.random();
+            colors[i * 3 + 2] = Math.random();
+        }
+        
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const particleMaterial = new THREE.PointsMaterial({
+            size: 0.2,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particles = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particles);
+        
+        // Animation du champ EM
+        function createFieldVectors() {
+            const vectorGroup = new THREE.Group();
+            const vectorCount = 100;
+            const vectors = [];
+            
+            for (let i = 0; i < vectorCount; i++) {
+                const dir = new THREE.Vector3(
+                    Math.random() - 0.5,
+                    Math.random() - 0.5,
+                    Math.random() - 0.5
+                ).normalize();
+                
+                const origin = new THREE.Vector3(
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40
+                );
+                
+                const length = Math.random() * 3;
+                const arrowHelper = new THREE.ArrowHelper(
+                    dir,
+                    origin,
+                    length,
+                    0xff0000,
+                    0.5,
+                    0.2
+                );
+                
+                vectors.push({
+                    arrow: arrowHelper,
+                    baseOrigin: origin.clone(),
+                    baseDir: dir.clone(),
+                    phase: Math.random() * Math.PI * 2
+                });
+                
+                vectorGroup.add(arrowHelper);
+            }
+            
+            scene.add(vectorGroup);
+            return vectors;
+        }
+        
+        let emVectors = createFieldVectors();
+        
+        // Configuration des graphiques
+        const spectrumCtx = document.getElementById('spectrum-chart').getContext('2d');
+        const spectrumChart = new Chart(spectrumCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 100}, (_, i) => i),
+                datasets: [{
+                    label: 'Spectre EM',
+                    data: Array(100).fill().map(() => Math.random() * 5),
+                    borderColor: '#8B5CF6',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    backgroundColor: context => {
+                        const bg = context.chart.ctx.createLinearGradient(0, 0, 0, 200);
+                        bg.addColorStop(0, 'rgba(139, 92, 246, 0.5)');
+                        bg.addColorStop(1, 'rgba(139, 92, 246, 0)');
+                        return bg;
+                    },
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
+            }
+        });
+        
+        const energyCtx = document.getElementById('energy-chart').getContext('2d');
+        const energyChart = new Chart(energyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['ΔE1', 'ΔE2', 'ΔE3', 'ΔE4', 'ΔE5'],
+                datasets: [{
+                    label: 'Variation énergie',
+                    data: [12, 19, 8, 15, 7],
+                    backgroundColor: [
+                        'rgba(236, 72, 153, 0.7)',
+                        'rgba(79, 70, 229, 0.7)',
+                        'rgba(6, 182, 212, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)'
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { color: 'rgba(255,255,255,0.7)' }
+                    }
+                }
+            }
+        });
+        
+        // Gestion des événements
+        document.getElementById('field-strength').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            document.getElementById('field-value').textContent = `${value} V/m`;
+            document.getElementById('intensity-bar').style.width = `${value / 10}%`;
+        });
+        
+        document.getElementById('frequency').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            document.getElementById('freq-value').textContent = `${value} Hz`;
+            
+            // Calcul longueur d'onde
+            const wavelength = (3e8 / value).toLocaleString('fr-FR');
+            document.getElementById('wavelength-value').textContent = `${wavelength} m`;
+        });
+        
+        // Animation de la scène
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+            
+            // Animation des particules
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < particleCount; i++) {
+                const x = positions[i * 3];
+                const y = positions[i * 3 + 1];
+                const z = positions[i * 3 + 2];
+                
+                // Simulation du champ EM
+                positions[i * 3] += 0.1 * Math.sin(time + x * 0.1 + z * 0.1);
+                positions[i * 3 + 1] += 0.1 * Math.cos(time + y * 0.1 + x * 0.05);
+                positions[i * 3 + 2] += 0.1 * Math.sin(time * 0.5 + z * 0.2);
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            // Animation des vecteurs champ EM
+            const fieldStrength = parseInt(document.getElementById('field-strength').value) / 100;
+            const frequency = parseInt(document.getElementById('frequency').value) / 20;
+            
+            emVectors.forEach(vec => {
+                const t = time * frequency + vec.phase;
+                const dx = Math.sin(t) * fieldStrength;
+                const dy = Math.cos(t * 0.7) * fieldStrength;
+                const dz = Math.sin(t * 0.3) * fieldStrength;
+                
+                vec.arrow.setDirection(
+                    new THREE.Vector3(
+                        vec.baseDir.x + dx,
+                        vec.baseDir.y + dy,
+                        vec.baseDir.z + dz
+                    ).normalize()
+                );
+                
+                const length = 2 + Math.abs(Math.sin(t * 2)) * 3 * fieldStrength;
+                vec.arrow.setLength(length, 0.5, 0.2);
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Redimensionnement responsive
+        window.addEventListener('resize', function() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+        
+        animate();
+    </script>
+</body>
+</html>
